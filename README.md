@@ -48,7 +48,7 @@ sudo pip3 install torch-vision
 
 #### Install gym-gazebo
 ```
-sudo pip3 install -e gym-gazebo/
+cd Active-Suspension/ && sudo pip3 install -e gym-gazebo/
 
 ```
 #### Run bash files, build the ros workspace:
