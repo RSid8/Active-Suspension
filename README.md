@@ -17,13 +17,6 @@ Codebase of the Gazebo RL Closed- Chain Active Suspension System
 #### ROS noetic related dependencies
 ```
 sudo apt-get install \
-python-pip python3-vcstool python3-pyqt4 \
-pyqt5-dev-tools \
-libbluetooth-dev libspnav-dev \
-pyqt4-dev-tools libcwiid-dev \
-cmake gcc g++ qt4-qmake libqt4-dev \
-libusb-dev libftdi-dev \
-python3-defusedxml python3-vcstool \
 ros-noetic-octomap-msgs        \
 ros-noetic-joy                 \
 ros-noetic-effort-controllers  \
