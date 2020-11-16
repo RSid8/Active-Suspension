@@ -48,13 +48,13 @@ sudo pip3 install torch-vision
 
 #### Install gym-gazebo
 ```
-sudo pip3 install -e .
+sudo pip3 install -e gym-gazebo/
 
 ```
 #### Run bash files, build the ros workspace:
 ```
 cd gym-gazebo/gym_gazebo/envs/installation
-bash setup_noetic.bash
+./setup_noetic.bash
 ```
 ## Kill Background Processes
 
