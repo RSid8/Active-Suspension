@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  
+
+  <include file="$(find lsd)/launch/empty_world.launch">
+ 
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+
+  </include>
+
+
+<param name="robot_description" textfile="$(find lsd)/urdf/lsd.urdf" />
+
+
+  <node
+    name="spawn_model"
+    pkg="gazebo_ros"
+    type="spawn_model"
+    args="-file $(find lsd)/models/lsd/model.sdf -sdf -z 0.5 -model lsd"
+    output="screen" />
+
+  <node
+    name="joint_state_publisher_gazebo"
+    pkg="joint_state_publisher"
+    type="joint_state_publisher" />
+
+
+  <!-- Load joint controller configurations from YAML file to parameter server -->
+<rosparam file="$(find lsd)/config/control.yaml" command="load"/> 
+
+  <!-- load the controllers -->
+<node name="controller_spawner1" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" ns="/lsd" args="joint1_position_controller joint2_position_controller 
+    joint3_position_controller joint4_position_controller joint_state_controller"/>
+
+
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+    respawn="false" output="screen"/>
+
+  <!--Pointcloud-->
+  <include file="$(find lsd)/launch/depth_proc.launch"/>
+
+</launch>
