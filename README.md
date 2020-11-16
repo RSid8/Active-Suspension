@@ -49,7 +49,7 @@ sudo pip3 install torch-vision
 
 #### Install gym-gazebo
 ```
-sudo pip install -e .
+sudo pip3 install -e .
 
 ```
 #### Run bash files, build the ros workspace:
