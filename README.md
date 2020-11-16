@@ -9,6 +9,11 @@ Codebase of the Gazebo RL Closed- Chain Active Suspension System
 - ROS noetic: Desktop-Full Install recommended, includes Gazebo 11.0.0 (http://wiki.ros.org/noetic/Installation/Ubuntu).
 - Gazebo 11.0.0
 
+#### Cloning Command
+
+    git clone --single-branch --branch=gym-gazebo https://github.com/Mars-Rover-Manipal/Active-Suspension.git
+
+
 #### ROS noetic related dependencies
 ```
 sudo apt-get install \
