@@ -52,8 +52,18 @@ sudo pip3 install torch-vision
 sudo pip install -e .
 
 ```
-
 #### Run bash files, build the ros workspace:
 ```
 cd gym-gazebo/gym_gazebo/envs/installation
 bash setup_noetic.bash
+```
+## Kill Background Processes
+
+* Add the alias to your bash script: (One time process)
+
+      echo "alias killgazebogym='killall -9 rosout roslaunch rosmaster gzserver nodelet robot_state_publisher gzclient'" >> ~/.bashrc
+      
+* When you want to kill all the gazebo processes:
+
+      source ~/.bashrc
+   
