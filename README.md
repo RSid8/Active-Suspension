@@ -26,6 +26,7 @@ libusb-dev libftdi-dev \
 python3-defusedxml python3-vcstool \
 ros-noetic-octomap-msgs        \
 ros-noetic-joy                 \
+ros-noetic-effort-controllers  \
 ros-noetic-geodesy             \
 ros-noetic-octomap-ros         \
 ros-noetic-control-toolbox     \
