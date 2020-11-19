@@ -88,14 +88,11 @@ class LsdEnv(gazebo_env.GazeboEnv):
        	
 
     def step(self, action):
-        rospy.wait_for_service('/gazebo/unpause_physics')
-        try:
-            self.unpause()
-        except (rospy.ServiceException) as e:
-            print ("/gazebo/pause_physics service call failed")
+
         vel_cmd = Twist()
         vel_cmd.linear.x=3
         vel_cmd.angular.z=0
+        
         self.velocity_publisher.publish(vel_cmd)
         
         
@@ -105,12 +102,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.joint_4_publisher.publish(radians(action[3]))
         #publish till the action taken is completed
         self.done=False
-        rospy.wait_for_service('/gazebo/pause_physics')
-        try:
-            #resp_pause = pause.call()
-            self.pause()
-        except (rospy.ServiceException) as e:
-            print ("/gazebo/pause_physics service call failed")
+
         observation_= self.observation_space
         #condition to check if the episode is complete
         self.get_reward()
