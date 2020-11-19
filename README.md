@@ -58,11 +58,11 @@ cd gym-gazebo/gym_gazebo/envs/installation
 ```
 ## Kill Background Processes
 
-* Add the alias to your bash script: (One time process)
+* Add the alias to your bash script and source it: (One time process)
 
-      echo "alias killgazebogym='killall -9 rosout roslaunch rosmaster gzserver nodelet robot_state_publisher gzclient'" >> ~/.bashrc
+      echo "alias killgazebogym='killall -9 rosout roslaunch rosmaster gzserver nodelet robot_state_publisher gzclient'" >> ~/.bashrc && source ~/.bashrc
       
 * When you want to kill all the gazebo processes:
 
-      source ~/.bashrc
+      killgazebogym
    
