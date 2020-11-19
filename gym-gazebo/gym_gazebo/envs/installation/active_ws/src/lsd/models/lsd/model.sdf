@@ -2253,7 +2253,7 @@
 <!--no gazebo nametag for SDF-->
 
   <plugin name="diffdrive_plugin_multiwheel" filename="libdiffdrive_plugin_multi_wheel.so">
-    <updateRate>0</updateRate>
+    <updateRate>50</updateRate>
     <leftJoints>FB_FW_l FB_MW_l RB_RW_l </leftJoints>
     <rightJoints>FB_FW_r FB_MW_r RB_RW_r </rightJoints>
     <wheelSeparation>0.81</wheelSeparation>

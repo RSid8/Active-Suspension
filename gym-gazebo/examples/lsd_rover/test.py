@@ -15,35 +15,42 @@ import time
 
 
 if __name__ == '__main__':
-    
-    
-    
-    env = gym.make('GazeboMarsLsdForce-Lidar-v0')
-    
-    
-    time.sleep(20)
-    
-    for i in range(400):
+	
+	
+	
+	env = gym.make('GazeboMarsLsdForce-Lidar-v0')
+	
+	
+	time.sleep(10)
+	
+	for i in range(400):
 
-        a=np.array([10*i, 10*i, 10*i, 10*i])
+	    a=np.array([10*i, 10*i, 10*i, 10*i])
 
-        env.step(a)
-    
-        time.sleep(5)
+	    env.step(a)
+	    print(env.get_observation())
+	
+	    time.sleep(5)
 
-        print(i)
+	    print(i)
 
-        env.reset()
-    
-    
-    
-        
-        
-    
+	    env.reset()
+	
+	
+	# while True:
 
-    
+	# 	for i in range(10000):
+
+	# 		print(env.get_observation())
+
+		
+	# 	env.reset()
+		
+	
+
+	
 
 
-        
+		
    
-        
+		

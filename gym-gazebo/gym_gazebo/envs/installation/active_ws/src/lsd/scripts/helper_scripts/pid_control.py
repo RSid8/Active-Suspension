@@ -7,7 +7,7 @@ from math import radians
 
 
 def calculate():
-    angle = radians(-30)
+    angle = radians(0)
     pub1.publish(angle)
     pub2.publish(angle)
     pub3.publish(angle)
