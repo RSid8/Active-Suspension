@@ -25,26 +25,19 @@ if __name__ == '__main__':
 	
 	for i in range(400):
 
-	    a=np.array([10*i, 10*i, 10*i, 10*i])
+	    a=np.array([20, 0, 0, 20])
 
 	    env.step(a)
+
 	    print(env.get_observation())
-	
-	    time.sleep(5)
+	    time.sleep(3)
 
 	    print(i)
 
 	    env.reset()
+
 	
 	
-	# while True:
-
-	# 	for i in range(10000):
-
-	# 		print(env.get_observation())
-
-		
-	# 	env.reset()
 		
 	
 
