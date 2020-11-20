@@ -20,6 +20,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def __init__(self):
 
         gazebo_env.GazeboEnv.__init__(self, "custom_world.launch")
+
         self.force_fl = 0
         self.force_fr = 0
         self.force_ml = 0
@@ -46,9 +47,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
         rospy.Subscriber("/mr_wheel_ft_sensor", WrenchStamped, self.callback_mr)
         rospy.Subscriber("/rl_wheel_ft_sensor", WrenchStamped, self.callback_rl)
         rospy.Subscriber("/rr_wheel_ft_sensor", WrenchStamped, self.callback_rr)
+
         rospy.Subscriber("/imu", Imu, self.callback_imu)
 
-        rospy.Subscriber("/r200/camera/depth_registered/points", Pointcloud2, self.callback_Pointcloud2)
+        #rospy.Subscriber("/r200/camera/depth_registered/points", Pointcloud2, self.callback_Pointcloud2)
 
 
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
@@ -61,12 +63,14 @@ class LsdEnv(gazebo_env.GazeboEnv):
                                                  Float64, queue_size=10)
         self.joint_4_publisher = rospy.Publisher("/lsd/joint4_position_controller/command",
                                                  Float64, queue_size=10)
+
         self.pause = rospy.ServiceProxy("/gazebo/pause", Empty)
         self.unpause = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
         self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
 
 
     def forward(self):
+
         vel_cmd = Twist()
         vel_cmd.linear.x = -2
         vel_cmd.angular.z = 0
@@ -76,6 +80,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def teleport(self):
 
         state_msg = ModelState()
+        
         state_msg.model_name = 'lsd'
         state_msg.pose.position.x = 0
         state_msg.pose.position.y = 0
@@ -121,14 +126,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.roll = degrees(self.roll)
         self.yaw = degrees(self.yaw)
 
-    def callback_Pointcloud2(self, msg):
+    #def callback_Pointcloud2(self, msg):
 
         
-
-
-
-
-
     def get_observation(self):
         self.observation_space = np.array([self.force_fl.x, self.force_fr.x, self.force_ml.x,
                                            self.force_mr.x, self.force_rl.x, self.force_rr.x,
@@ -154,6 +154,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         return state_
 
     def get_reward(self):
+
         threshold = (-0.5236, 0.5236)
         if threshold[0] > self.chassis_angle > threshold[1]:
             self.reward += 1
