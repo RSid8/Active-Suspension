@@ -3,7 +3,7 @@
   
 
   
-<arg name="world_name" default="empty.world"/>
+<arg name="world_name" default="obstacles.world"/>
 
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
