@@ -2,8 +2,11 @@
 <launch>
   
 
-  <include file="$(find lsd)/launch/empty_world.launch">
- 
+<arg name="world_name" default="empty.world"/>
+
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find lsd)/worlds/$(arg world_name)"/>
     <arg name="paused" default="false"/>
     <arg name="use_sim_time" default="true"/>
     <arg name="gui" default="true"/>
