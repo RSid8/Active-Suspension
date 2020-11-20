@@ -56,6 +56,17 @@ cd Active-Suspension/ && sudo pip3 install -e gym-gazebo/
 cd gym-gazebo/gym_gazebo/envs/installation
 ./setup_noetic.bash
 ```
+
+## Launch the simulation
+
+* In an empty world: (by default)
+
+      roslaunch lsd custom_world.launch
+      
+* In a world of your choice:
+
+      roslaunch lsd custom_world.launch world_name:=world_name.world
+
 ## Kill Background Processes
 
 * Add the alias to your bash script and source it: (One time process)
@@ -66,3 +77,7 @@ cd gym-gazebo/gym_gazebo/envs/installation
 
       killgazebogym
    
+
+
+
+
