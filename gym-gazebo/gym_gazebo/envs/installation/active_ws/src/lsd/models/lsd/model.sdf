@@ -126,7 +126,7 @@
      
 
       <sensor name='lidar' type='ray'>
-        <visualize>1</visualize>
+        <visualize>false</visualize>
         <update_rate>50</update_rate>
         <ray>
           <scan>

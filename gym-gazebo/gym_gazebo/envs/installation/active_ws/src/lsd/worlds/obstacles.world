@@ -13,6 +13,19 @@
       <pose>0 0 0 0 0 0</pose>
     </include>
 
+    <!--Obstacles-->
+    <include>
+      <uri>model://step</uri>
+      <name>step1</name>
+      <pose>3 0 0.175 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://step</uri>
+      <name>step2</name>
+      <pose>7 0 0.175 0 0 0</pose>
+    </include>
+
 <scene>
   <sky>
     <clouds>
