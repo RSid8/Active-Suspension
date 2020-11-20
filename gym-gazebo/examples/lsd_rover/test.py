@@ -30,7 +30,7 @@ if __name__ == '__main__':
 	    env.step(a)
 
 	    print(env.get_observation())
-	    time.sleep(3)
+	    time.sleep(10)
 
 	    print(i)
 

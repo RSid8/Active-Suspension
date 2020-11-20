@@ -72,7 +72,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -2
+        vel_cmd.linear.x = -3
         vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -144,11 +144,19 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.joint_3_publisher.publish(action[2])
         self.joint_4_publisher.publish(action[3])
         # publish till the action taken is completed
-        self.done = False
-
+        
         observation_ = self.observation_space
         # condition to check if the episode is complete
+
+        if(self.pitch>0.5236 | self.pitch<-0.5236 | self.roll>0.5236 | self.roll<-0.5236):
+            
+            self.done= True
+        else:
+            
+            self.done= False
+
         self.get_reward()
+
         # compute reward due to the action taken
         state_ = (observation_, self.reward, self.done, {})
         return state_
@@ -156,9 +164,11 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def get_reward(self):
 
         threshold = (-0.5236, 0.5236)
-        if threshold[0] > self.chassis_angle > threshold[1]:
+        if threshold[0] > self.pitch > threshold[1]:
             self.reward += 1
-        else:
+        elif threshold[0] > self.roll > threshold[1]:
+            self.reward += 1
+        else:    
             self.reward -= 15
             self.done = True
         # force thresholds to be added
