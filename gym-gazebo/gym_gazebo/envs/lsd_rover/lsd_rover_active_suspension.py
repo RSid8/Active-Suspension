@@ -12,6 +12,7 @@ from sensor_msgs.msg import Imu, LaserScan
 import rospkg
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
+import time
 
 rospack = rospkg.RosPack()
 
@@ -47,7 +48,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
         rospy.Subscriber("/rr_wheel_ft_sensor", WrenchStamped, self.callback_rr)
         rospy.Subscriber("/imu", Imu, self.callback_imu)
 
-        self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10, latch=True)
+        rospy.Subscriber("/r200/camera/depth_registered/points", Pointcloud2, self.callback_Pointcloud2)
+
+
+        self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
 
         self.joint_1_publisher = rospy.Publisher("/lsd/joint1_position_controller/command",
                                                  Float64, queue_size=10)
@@ -64,7 +68,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
     def forward(self):
         vel_cmd = Twist()
-        vel_cmd.linear.x = -3
+        vel_cmd.linear.x = -2
         vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -117,9 +121,17 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.roll = degrees(self.roll)
         self.yaw = degrees(self.yaw)
 
+    def callback_Pointcloud2(self, msg):
+
+        
+
+
+
+
+
     def get_observation(self):
-        self.observation_space = np.array([self.force_fl, self.force_fr, self.force_ml,
-                                           self.force_mr, self.force_rl, self.force_rr,
+        self.observation_space = np.array([self.force_fl.x, self.force_fr.x, self.force_ml.x,
+                                           self.force_mr.x, self.force_rl.x, self.force_rr.x,
                                            self.pitch, self.roll])
         return self.observation_space
 
@@ -127,10 +139,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
         
         self.forward()
 
-        self.joint_1_publisher.publish(radians(action[0]))
-        self.joint_2_publisher.publish(radians(action[1]))
-        self.joint_3_publisher.publish(radians(action[2]))
-        self.joint_4_publisher.publish(radians(action[3]))
+        self.joint_1_publisher.publish(action[0])
+        self.joint_2_publisher.publish(action[1])
+        self.joint_3_publisher.publish(action[2])
+        self.joint_4_publisher.publish(action[3])
         # publish till the action taken is completed
         self.done = False
 
@@ -153,6 +165,19 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def reset(self):
 
         self.teleport()
+
+        vel_cmd = Twist()
+        vel_cmd.linear.x = 0
+        vel_cmd.angular.z = 0
+
+        self.velocity_publisher.publish(vel_cmd)
+
+        self.joint_1_publisher.publish(0)
+        self.joint_2_publisher.publish(0)
+        self.joint_3_publisher.publish(0)
+        self.joint_4_publisher.publish(0)
+
+        time.sleep(10)
 
         # unpause simulation to make an observation and reset the values
         rospy.wait_for_service('/gazebo/unpause_physics')
