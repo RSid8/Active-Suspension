@@ -31,7 +31,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.roll = 0
         self.yaw = 0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(9, 1), dtype=np.float32)
+        self.observation_space = spaces.Box(-inf, inf, shape=(8, 1), dtype=np.float32)
         self.orientation_list = []
         self.action_space = spaces.Box(-60, 60, shape=(4, 1), dtype=np.float32)
         self.obstacle_distance = 0
@@ -148,7 +148,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         observation_ = self.observation_space
         # condition to check if the episode is complete
 
-        if(self.pitch>0.5236 | self.pitch<-0.5236 | self.roll>0.5236 | self.roll<-0.5236):
+        if(self.pitch>0.5236 or self.pitch<-0.5236 or self.roll>0.5236 or self.roll<-0.5236):
             
             self.done= True
         else:
