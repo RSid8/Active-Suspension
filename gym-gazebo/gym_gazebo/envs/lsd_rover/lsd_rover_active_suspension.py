@@ -31,9 +31,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.roll = 0
         self.yaw = 0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(8, 1), dtype=np.float32)
+        self.observation_space = spaces.Box(-inf, inf, shape=(8,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(-60, 60, shape=(4, 1), dtype=np.float32)
+        self.action_space = spaces.Box(-60, 60, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.chassis_angle = 0
         self.done = False
@@ -170,7 +170,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         else:    
             self.reward -= 15
         
-        if(abs(self.force_fl.x) < 200 and abs(self.force_fr.x) <200)
+        if(abs(self.force_fl.x) < 200 and abs(self.force_fr.x) <200):
             self.reward +=5
 
     def reset(self):
@@ -199,6 +199,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
             print("/gazebo/unpause_physics service call failed")
 
         self.reward = 0
+
         initial_reading = self.get_observation()
 
         rospy.wait_for_service('/gazebo/pause_physics')
