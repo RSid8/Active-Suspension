@@ -8,6 +8,7 @@ import os
 import matplotlib.pyplot as plt 
 import gym
 import gym_gazebo
+import time
 #####################################################################################################################################################################################################################
 class ReplayBuffer():
     def __init__(self, max_size, input_shape, n_actions):
@@ -106,7 +107,8 @@ class ActorNetwork(nn.Module):
         prob = self.fc2(prob)
         prob = F.relu(prob)
 
-        mu = T.tanh(self.mu(prob))
+        mu = self.mu(prob)
+        #print(mu)
 
         return mu
 
@@ -120,11 +122,11 @@ class ActorNetwork(nn.Module):
 
 #####################################################################################################################################################################################################################
 class Agent():
-    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=1000, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=0.1):
+    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=1000, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=60):
         self.gamma = gamma
         self.tau = tau
-        self.max_action = np.array([60.0,60.0,60.0,60.0])
-        self.min_action = np.array([-30.0,-30.0,-30.0,-30.0])
+        self.max_action = env.action_space.high
+        self.min_action = env.action_space.low
         self.memory = ReplayBuffer(max_size, input_dims, n_actions)
         self.batch_size = batch_size
         self.learn_step_cntr = 0
@@ -147,13 +149,15 @@ class Agent():
 
     def choose_action(self, observation):
         if self.time_step < self.warmup:
-            mu = T.tensor(np.random.normal(scale=self.noise, size=(self.n_actions,)))
+            mu = T.tensor(np.random.normal(loc=0.0,scale=self.noise, size=(self.n_actions,)))
         else:
             state = T.tensor(observation, dtype=T.float).to(self.actor.device)
             mu = self.actor.forward(state).to(self.actor.device)
         mu_prime = mu + T.tensor(np.random.normal(scale=self.noise), dtype=T.float).to(self.actor.device)
 
         mu_prime = T.clamp(mu_prime, self.min_action[0], self.max_action[0])
+        print(mu_prime)
+
         self.time_step += 1
 
         return mu_prime.cpu().detach().numpy()
@@ -277,6 +281,7 @@ def plot_learning_curve(x, scores, figure_file):
 if __name__ == '__main__':
     
     env = gym.make('GazeboMarsLsdForce-Lidar-v0')
+    
     agent = Agent(alpha=0.001, beta=0.001,
             input_dims=env.observation_space.shape, tau=0.005,   ##observation_space.shape= numpy array for size 7 or 9
             env=env, batch_size=100, layer1_size=400, layer2_size=300,
@@ -290,11 +295,15 @@ if __name__ == '__main__':
     #agent.load_models()
 
     for i in range(n_games):
+
+        print(i)
+        t=0
         observation = env.reset()
         done = False
         score = 0
         while not done:
             action = agent.choose_action(observation)
+
             observation_, reward, done, info = env.step(action)
             agent.remember(observation, action, reward, observation_, done)
             agent.learn()

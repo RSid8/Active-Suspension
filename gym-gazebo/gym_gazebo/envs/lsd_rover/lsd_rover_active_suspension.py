@@ -72,7 +72,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -1
+        vel_cmd.linear.x = -2
         vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -136,6 +136,14 @@ class LsdEnv(gazebo_env.GazeboEnv):
         return self.observation_space
 
     def step(self, action):
+
+
+
+        rospy.wait_for_service('/gazebo/unpause_physics')
+        try:
+            self.unpause()
+        except (rospy.ServiceException) as e:
+            print ("/gazebo/unpause_physics service call failed")
         
         self.forward()
 
@@ -147,9 +155,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
         
         observation_ = self.observation_space
         
-        if(self.pitch>0.5236 or self.pitch<-0.5236 or self.roll>0.5236 or self.roll<-0.5236):
+        if(abs(self.pitch)>14.0):
             
             self.done= True
+            
         else:
             
             self.done= False
@@ -162,16 +171,19 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
     def get_reward(self):
 
-        threshold = (-0.5236, 0.5236)
-        if threshold[0] > self.pitch > threshold[1]:
-            self.reward += 1
-        elif threshold[0] > self.roll > threshold[1]:
-            self.reward += 1
+        threshold = (-14, 14)
+        if threshold[0] < self.pitch < threshold[1]:
+            self.reward += 2
         else:    
-            self.reward -= 15
+            self.reward -= 100
         
-        if(abs(self.force_fl.x) < 200 and abs(self.force_fr.x) <200):
-            self.reward +=5
+        #if(abs(self.force_fl.x) < 100 and abs(self.force_fr.x) <100):
+           # self.reward +=5
+        #if(abs(self.force_ml.x) < 100 and abs(self.force_mr.x) <100):
+           # self.reward +=5
+        #if(abs(self.force_rl.x) < 100 and abs(self.force_rr.x) <100):
+            #self.reward +=5
+
 
     def reset(self):
 
