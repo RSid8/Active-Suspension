@@ -22,19 +22,22 @@ if __name__ == '__main__':
 	
 	
 	time.sleep(10)
+	done=False
 	
-	for i in range(400):
+	while not done:
 
-	    a=np.array([20, 0, 0, 20])
+	    a=np.array([0, 0, 0, 0])
 
 	    env.step(a)
 
+
+	    time.sleep(3)
+
 	    print(env.get_observation())
-	    time.sleep(10)
 
-	    print(i)
+	 
 
-	    env.reset()
+	    
 
 	
 	

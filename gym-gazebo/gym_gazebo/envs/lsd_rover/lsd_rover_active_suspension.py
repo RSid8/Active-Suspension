@@ -72,7 +72,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -3
+        vel_cmd.linear.x = -1
         vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -130,9 +130,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         
     def get_observation(self):
-        self.observation_space = np.array([self.force_fl.x, self.force_fr.x, self.force_ml.x,
+        self.observation_space = [self.force_fl.x, self.force_fr.x, self.force_ml.x,
                                            self.force_mr.x, self.force_rl.x, self.force_rr.x,
-                                           self.pitch, self.roll])
+                                           self.pitch, self.roll]
         return self.observation_space
 
     def step(self, action):
@@ -146,8 +146,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         # publish till the action taken is completed
         
         observation_ = self.observation_space
-        # condition to check if the episode is complete
-
+        
         if(self.pitch>0.5236 or self.pitch<-0.5236 or self.roll>0.5236 or self.roll<-0.5236):
             
             self.done= True
@@ -157,7 +156,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         self.get_reward()
 
-        # compute reward due to the action taken
+        
         state_ = (observation_, self.reward, self.done, {})
         return state_
 
@@ -170,8 +169,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
             self.reward += 1
         else:    
             self.reward -= 15
-            self.done = True
-        # force thresholds to be added
+        
+        if(abs(self.force_fl.x) < 200 and abs(self.force_fr.x) <200)
+            self.reward +=5
 
     def reset(self):
 
@@ -188,7 +188,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.joint_3_publisher.publish(0)
         self.joint_4_publisher.publish(0)
 
-        time.sleep(10)
+        time.sleep(5)
 
         # unpause simulation to make an observation and reset the values
         rospy.wait_for_service('/gazebo/unpause_physics')
