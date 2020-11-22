@@ -64,7 +64,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.joint_4_publisher = rospy.Publisher("/lsd/joint4_position_controller/command",
                                                  Float64, queue_size=10)
 
-        self.pause = rospy.ServiceProxy("/gazebo/pause", Empty)
+        self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
         self.unpause = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
         self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
 
