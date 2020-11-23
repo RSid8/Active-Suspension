@@ -213,6 +213,47 @@
 </joint>
 
 
+<!--...........................ULTRASONIC MODEL .................................-->
+
+
+<link name="ultrasonic">
+
+  <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+  </inertial>
+
+  <collision name='collision'>
+      <geometry>
+        <box size="0.03 0.03 0.03"/>
+      </geometry>
+	  <origin xyz="0 0 0" rpy="0 0 0"/>
+  </collision>
+
+  <visual>
+      <geometry>
+      	<box size="0.03 0.03 0.03"/>
+      </geometry>
+	 <origin xyz="0 0 0" rpy="0 0 0"/>
+	 <material name="green">
+     	<color rgba="0.0 0.8 0.0 1.0"/>
+     </material>
+  </visual>
+
+</link>
+
+<gazebo reference="ultrasonic">
+    <material>Gazebo/Green</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+
+<joint name="ultrasonic_joint" type="fixed">
+    <origin rpy="0 1.5707 0" xyz="0 0 -0.1" />
+    <parent link="CH"/>
+    <child link="ultrasonic"/>
+</joint>
+
 
 <!--................................................................................-->
 
