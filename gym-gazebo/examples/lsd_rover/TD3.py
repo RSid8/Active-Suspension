@@ -108,7 +108,7 @@ class ActorNetwork(nn.Module):
         prob = F.relu(prob)
 
         mu = self.mu(prob)
-        #print(mu)
+        
 
         return mu
 
@@ -156,7 +156,7 @@ class Agent():
         mu_prime = mu + T.tensor(np.random.normal(scale=self.noise), dtype=T.float).to(self.actor.device)
 
         mu_prime = T.clamp(mu_prime, self.min_action[0], self.max_action[0])
-        print(mu_prime)
+    
 
         self.time_step += 1
 
@@ -295,15 +295,12 @@ if __name__ == '__main__':
     #agent.load_models()
 
     for i in range(n_games):
-
-        print(i)
-        t=0
+        t=agent.time_step
         observation = env.reset()
         done = False
         score = 0
         while not done:
             action = agent.choose_action(observation)
-
             observation_, reward, done, info = env.step(action)
             agent.remember(observation, action, reward, observation_, done)
             agent.learn()

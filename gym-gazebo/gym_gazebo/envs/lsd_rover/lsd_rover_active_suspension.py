@@ -2,6 +2,7 @@ from math import degrees, inf, radians
 import rospy
 import numpy as np
 from std_msgs.msg import Float64
+from sensor_msgs.msg import Range
 from geometry_msgs.msg import Twist, WrenchStamped
 from gazebo_msgs.msg import LinkStates
 from std_srvs.srv import Empty
@@ -30,15 +31,15 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.pitch = 0
         self.roll = 0
         self.yaw = 0
+        self.ground_clearance=0
         self.reward = 0
         self.observation_space = spaces.Box(-inf, inf, shape=(8,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(-60, 60, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(-30, 50, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.chassis_angle = 0
         self.done = False
         self.package_path = rospack.get_path('lsd')
-
 
 
         rospy.Subscriber("/fl_wheel_ft_sensor", WrenchStamped, self.callback_fl)
@@ -49,6 +50,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
         rospy.Subscriber("/rr_wheel_ft_sensor", WrenchStamped, self.callback_rr)
 
         rospy.Subscriber("/imu", Imu, self.callback_imu)
+
+        rospy.Subscriber("/sonar", Range, self.callback_sonar)
 
         #rospy.Subscriber("/r200/camera/depth_registered/points", Pointcloud2, self.callback_Pointcloud2)
 
@@ -126,17 +129,20 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.roll = degrees(self.roll)
         self.yaw = degrees(self.yaw)
 
+    def callback_sonar(self, msg):
+
+        self.ground_clearance=msg.range
+
     #def callback_Pointcloud2(self, msg):
 
         
     def get_observation(self):
         self.observation_space = [self.force_fl.x, self.force_fr.x, self.force_ml.x,
                                            self.force_mr.x, self.force_rl.x, self.force_rr.x,
-                                           self.pitch, self.roll]
+                                           self.pitch, self.roll, 100*self.ground_clearance]
         return self.observation_space
 
     def step(self, action):
-
 
 
         rospy.wait_for_service('/gazebo/unpause_physics')
@@ -154,8 +160,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
         # publish till the action taken is completed
         
         observation_ = self.observation_space
-        
-        if(abs(self.pitch)>14.0):
+
+        if(self.pitch>17 or self.roll>17):
             
             self.done= True
             
@@ -171,14 +177,16 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
     def get_reward(self):
 
-        threshold = (-14, 14)
-        if threshold[0] < self.pitch < threshold[1]:
-            self.reward += 2
-        else:    
+        threshold = (-15, 15)
+        if threshold[0] > self.pitch > threshold[1]:
             self.reward -= 100
+        elif threshold[0] > self.roll > threshold[1]:
+            self.reward -= 100
+        else:
+            self.reward += 1
         
-        #if(abs(self.force_fl.x) < 100 and abs(self.force_fr.x) <100):
-           # self.reward +=5
+        #if(abs(self.force_fl.x) > 100 and abs(self.force_fr.x) >100):
+           #self.reward -=10
         #if(abs(self.force_ml.x) < 100 and abs(self.force_mr.x) <100):
            # self.reward +=5
         #if(abs(self.force_rl.x) < 100 and abs(self.force_rr.x) <100):

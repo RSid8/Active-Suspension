@@ -26,12 +26,7 @@ if __name__ == '__main__':
 	
 	while not done:
 
-	    a=np.array([0, 0, 0, 0])
-
-	    env.step(a)
-
-
-	    time.sleep(3)
+	   
 
 	    print(env.get_observation())
 
