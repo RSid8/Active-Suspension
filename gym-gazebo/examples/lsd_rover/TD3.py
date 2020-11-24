@@ -122,7 +122,7 @@ class ActorNetwork(nn.Module):
 
 #####################################################################################################################################################################################################################
 class Agent():
-    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=1000, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=60):
+    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=200, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=60):
         self.gamma = gamma
         self.tau = tau
         self.max_action = env.action_space.high
@@ -297,11 +297,17 @@ if __name__ == '__main__':
     for i in range(n_games):
         t=agent.time_step
         observation = env.reset()
+        p=0
         done = False
         score = 0
         while not done:
             action = agent.choose_action(observation)
+            p=p+1
             observation_, reward, done, info = env.step(action)
+            if(p==1000):
+                done=True
+            else:
+                pass        
             agent.remember(observation, action, reward, observation_, done)
             agent.learn()
             score += reward

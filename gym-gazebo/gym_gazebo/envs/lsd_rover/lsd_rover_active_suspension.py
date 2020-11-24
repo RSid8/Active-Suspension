@@ -33,7 +33,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.yaw = 0
         self.ground_clearance=0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(8,), dtype=np.float32)
+        self.observation_space = spaces.Box(-inf, inf, shape=(9,), dtype=np.float32)
         self.orientation_list = []
         self.action_space = spaces.Box(-30, 50, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
@@ -161,7 +161,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         
         observation_ = self.observation_space
 
-        if(self.pitch>17 or self.roll>17):
+        if(self.pitch>15 or self.roll>15):
             
             self.done= True
             
@@ -183,10 +183,13 @@ class LsdEnv(gazebo_env.GazeboEnv):
         elif threshold[0] > self.roll > threshold[1]:
             self.reward -= 100
         else:
-            self.reward += 1
-        
-        #if(abs(self.force_fl.x) > 100 and abs(self.force_fr.x) >100):
-           #self.reward -=10
+            self.reward += 1 
+
+        if(-3<self.pitch<3 and self.ground_clearance<29):
+            self.reward -=10    
+ 
+        if((self.force_fl.x) < -100 and (self.force_fr.x) < -100):
+           self.reward -=10
         #if(abs(self.force_ml.x) < 100 and abs(self.force_mr.x) <100):
            # self.reward +=5
         #if(abs(self.force_rl.x) < 100 and abs(self.force_rr.x) <100):

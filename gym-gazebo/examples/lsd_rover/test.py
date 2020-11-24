@@ -23,16 +23,18 @@ if __name__ == '__main__':
 	
 	time.sleep(10)
 	done=False
+	a=np.array([0,0,0,0])
 	
 	while not done:
 
 	   
-
-	    print(env.get_observation())
+		env.step(a)
+		
+		print(env.get_observation())
 
 	 
 
-	    
+		
 
 	
 	
