@@ -42,13 +42,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.package_path = rospack.get_path('lsd')
 
 
-        rospy.Subscriber("/fl_wheel_ft_sensor", WrenchStamped, self.callback_fl)
-        rospy.Subscriber("/fr_wheel_ft_sensor", WrenchStamped, self.callback_fr)
-        rospy.Subscriber("/ml_wheel_ft_sensor", WrenchStamped, self.callback_ml)
-        rospy.Subscriber("/mr_wheel_ft_sensor", WrenchStamped, self.callback_mr)
-        rospy.Subscriber("/rl_wheel_ft_sensor", WrenchStamped, self.callback_rl)
-        rospy.Subscriber("/rr_wheel_ft_sensor", WrenchStamped, self.callback_rr)
-
         rospy.Subscriber("/imu", Imu, self.callback_imu)
 
         rospy.Subscriber("/sonar", Range, self.callback_sonar)
@@ -102,24 +95,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
             print("Service call failed: %s" % e)
 
 
-    def callback_fl(self, msg):
-        self.force_fl = msg.wrench.force
-
-    def callback_fr(self, msg):
-        self.force_fr = msg.wrench.force
-
-    def callback_ml(self, msg):
-        self.force_ml = msg.wrench.force
-
-    def callback_mr(self, msg):
-        self.force_mr = msg.wrench.force
-
-    def callback_rl(self, msg):
-        self.force_rl = msg.wrench.force
-
-    def callback_rr(self, msg):
-        self.force_rr = msg.wrench.force
-
     def callback_imu(self, msg):
 
         self.orientation_list = [msg.orientation.x, msg.orientation.y, msg.orientation.z,
@@ -172,20 +147,20 @@ class LsdEnv(gazebo_env.GazeboEnv):
             self.reward -= 10000
         elif -7 > self.roll > 7:
             self.reward -= 10000
-        else:
-            self.reward += 2
-        if self.ground_clearance<30:
+        elif self.ground_clearance<30:
             self.reward -=100    
         else:
-            pass 
+            self.reward+=2
+
+        ##########END CONDITION ###########       
         if(self.pitch>15 or self.roll>7):
             
             self.done= True
-            self.reward-=1000000
-            
+            self.reward-=1000000   
         else:
             
-            self.done= False        
+            self.done= False   
+        ###################################         
     
     def reset(self):
 
