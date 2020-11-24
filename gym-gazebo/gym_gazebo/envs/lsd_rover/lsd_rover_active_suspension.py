@@ -33,9 +33,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.yaw = 0
         self.ground_clearance=0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(9,), dtype=np.float32)
+        self.observation_space = spaces.Box(-inf, inf, shape=(3,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(-30, 50, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(-25, 35, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.chassis_angle = 0
         self.done = False
@@ -75,7 +75,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -2
+        vel_cmd.linear.x = -3
         vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -137,9 +137,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         
     def get_observation(self):
-        self.observation_space = [self.force_fl.x, self.force_fr.x, self.force_ml.x,
-                                           self.force_mr.x, self.force_rl.x, self.force_rr.x,
-                                           self.pitch, self.roll, 100*self.ground_clearance]
+        self.observation_space = [self.pitch, self.roll, 100*self.ground_clearance]
         return self.observation_space
 
     def step(self, action):
@@ -161,14 +159,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
         
         observation_ = self.observation_space
 
-        if(self.pitch>15 or self.roll>15):
-            
-            self.done= True
-            
-        else:
-            
-            self.done= False
-
         self.get_reward()
 
         
@@ -179,23 +169,24 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         threshold = (-15, 15)
         if threshold[0] > self.pitch > threshold[1]:
-            self.reward -= 100
-        elif threshold[0] > self.roll > threshold[1]:
-            self.reward -= 100
+            self.reward -= 10000
+        elif -7 > self.roll > 7:
+            self.reward -= 10000
         else:
-            self.reward += 1 
-
-        if(-3<self.pitch<3 and self.ground_clearance<29):
-            self.reward -=10    
- 
-        if((self.force_fl.x) < -100 and (self.force_fr.x) < -100):
-           self.reward -=10
-        #if(abs(self.force_ml.x) < 100 and abs(self.force_mr.x) <100):
-           # self.reward +=5
-        #if(abs(self.force_rl.x) < 100 and abs(self.force_rr.x) <100):
-            #self.reward +=5
-
-
+            self.reward += 2
+        if self.ground_clearance<30:
+            self.reward -=100    
+        else:
+            pass 
+        if(self.pitch>15 or self.roll>7):
+            
+            self.done= True
+            self.reward-=1000000
+            
+        else:
+            
+            self.done= False        
+    
     def reset(self):
 
         self.teleport()
