@@ -2,8 +2,9 @@ from math import degrees, inf, radians
 import rospy
 import numpy as np
 from std_msgs.msg import Float64
+from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Range
-from geometry_msgs.msg import Twist, WrenchStamped
+from geometry_msgs.msg import Twist
 from gazebo_msgs.msg import LinkStates
 from std_srvs.srv import Empty
 from gym import utils, spaces
@@ -33,9 +34,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.yaw = 0
         self.ground_clearance=0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(3,), dtype=np.float32)
+        self.observation_space = spaces.Box(-inf, inf, shape=(4,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(-25, 35, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(-20, 30, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.chassis_angle = 0
         self.done = False
@@ -46,10 +47,13 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         rospy.Subscriber("/sonar", Range, self.callback_sonar)
 
+        rospy.Subscriber("/odom", Odometry, self.callback_pose)
+
         #rospy.Subscriber("/r200/camera/depth_registered/points", Pointcloud2, self.callback_Pointcloud2)
 
 
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
+
 
         self.joint_1_publisher = rospy.Publisher("/lsd/joint1_position_controller/command",
                                                  Float64, queue_size=10)
@@ -68,7 +72,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -3
+        vel_cmd.linear.x = -2
         vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -108,11 +112,14 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         self.ground_clearance=msg.range
 
-    #def callback_Pointcloud2(self, msg):
+
+    def callback_pose(self, msg):
+        self.actual_speed=msg.twist.twist.linear.x
+        self.y_speed=msg.twist.twist.linear.y
 
         
     def get_observation(self):
-        self.observation_space = [self.pitch, self.roll, 100*self.ground_clearance]
+        self.observation_space = [self.pitch, self.roll, 100*self.ground_clearance, self.actual_speed]
         return self.observation_space
 
     def step(self, action):
@@ -144,19 +151,24 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         threshold = (-15, 15)
         if threshold[0] > self.pitch > threshold[1]:
-            self.reward -= 10000
+            self.reward -= 5
         elif -7 > self.roll > 7:
-            self.reward -= 10000
-        elif self.ground_clearance<30:
-            self.reward -=100    
+            self.reward -= 5
+        elif 28<self.ground_clearance<30:
+            self.reward +=5   
+        elif self.actual_speed>1:
+            self.reward+=5  
+        elif self.y_speed<0.5:
+            self.reward+=1   
         else:
-            self.reward+=2
+            self.reward-=1
+
 
         ##########END CONDITION ###########       
         if(self.pitch>15 or self.roll>7):
             
             self.done= True
-            self.reward-=1000000   
+            self.reward-=1000
         else:
             
             self.done= False   

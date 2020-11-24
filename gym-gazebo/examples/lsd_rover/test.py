@@ -27,10 +27,9 @@ if __name__ == '__main__':
 	
 	while not done:
 
-	   
 		env.step(a)
 		
-		print(env.get_observation())
+		env.get_observation()
 
 	 
 
