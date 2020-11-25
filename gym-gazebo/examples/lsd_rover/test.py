@@ -23,7 +23,7 @@ if __name__ == '__main__':
 	
 	time.sleep(10)
 	done=False
-	a=np.array([0,0,0,0])
+	a=np.array([1,1,0,0])
 	
 	while not done:
 

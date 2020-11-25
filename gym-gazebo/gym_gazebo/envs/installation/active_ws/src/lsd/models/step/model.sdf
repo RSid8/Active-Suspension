@@ -10,14 +10,14 @@
       <collision name="collision">
         <geometry>
           <box>
-            <size>2.5 2.5 .35</size>
+            <size>2.5 108.5 .30</size>
           </box>
         </geometry>
       </collision>
       <visual name="visual">
         <geometry>
           <box>
-            <size>2.5 2.5 .35</size>
+            <size>2.5 108.5 .30</size>
           </box>
         </geometry>
       </visual>
