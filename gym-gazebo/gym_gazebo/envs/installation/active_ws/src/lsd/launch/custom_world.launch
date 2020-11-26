@@ -3,8 +3,9 @@
   
 
   
+<node name="pcl_processing_node" pkg="lsd" type="cloudy"/>
 
-
+<arg name="world_name" default="empty.world"/>
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find lsd)/worlds/$(arg world_name)"/>

@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(lsd)
 
+# PCL 14
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -57,4 +62,7 @@ install(
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
+
+add_executable(cloudy src/cloudy.cpp)
+target_link_libraries(cloudy ${catkin_LIBRARIES})
 
