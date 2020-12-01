@@ -56,13 +56,13 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
 
 
-        self.joint_1_publisher = rospy.Publisher("/lsd/joint1_position_controller/command",
+        self.joint_1_publisher = rospy.Publisher("/lsd/fl_joint_position_controller/command",
                                                  Float64, queue_size=10)
-        self.joint_2_publisher = rospy.Publisher("/lsd/joint2_position_controller/command",
+        self.joint_2_publisher = rospy.Publisher("/lsd/fr_joint_position_controller/command",
                                                  Float64, queue_size=10)
-        self.joint_3_publisher = rospy.Publisher("/lsd/joint3_position_controller/command",
+        self.joint_3_publisher = rospy.Publisher("/lsd/bl_joint_position_controller/command",
                                                  Float64, queue_size=10)
-        self.joint_4_publisher = rospy.Publisher("/lsd/joint4_position_controller/command",
+        self.joint_4_publisher = rospy.Publisher("/lsd/br_joint_position_controller/command",
                                                  Float64, queue_size=10)
 
         self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
@@ -73,7 +73,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -0.5
+        vel_cmd.linear.x = -3.5
         vel_cmd.angular.z =0
 
         self.velocity_publisher.publish(vel_cmd)

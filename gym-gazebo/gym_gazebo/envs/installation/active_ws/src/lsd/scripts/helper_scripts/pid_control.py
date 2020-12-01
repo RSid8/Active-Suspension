@@ -22,10 +22,10 @@ def listener():
 if __name__ == '__main__':
     try:
 
-        pub1 = rospy.Publisher('/lsd/joint1_position_controller/command', Float64, queue_size=10)
-        pub2 = rospy.Publisher('/lsd/joint2_position_controller/command', Float64, queue_size=10)
-        pub3 = rospy.Publisher('/lsd/joint3_position_controller/command', Float64, queue_size=10)
-        pub4 = rospy.Publisher('/lsd/joint4_position_controller/command', Float64, queue_size=10)
+        pub1 = rospy.Publisher('/lsd/fl_joint_position_controller/command', Float64, queue_size=10)
+        pub2 = rospy.Publisher('/lsd/fr_joint_position_controller/command', Float64, queue_size=10)
+        pub3 = rospy.Publisher('/lsd/bl_joint_position_controller/command', Float64, queue_size=10)
+        pub4 = rospy.Publisher('/lsd/br_joint_position_controller/command', Float64, queue_size=10)
         rospy.init_node('Communication', anonymous=True, disable_signals=True)
         rate = rospy.Rate(50)
 

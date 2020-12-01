@@ -39,8 +39,8 @@
 
   <!-- load the controllers -->
 <node name="controller_spawner1" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" ns="/lsd" args="joint1_position_controller joint2_position_controller 
-    joint3_position_controller joint4_position_controller joint_state_controller"/>
+    output="screen" ns="/lsd" args="fl_joint_position_controller fr_joint_position_controller 
+    bl_joint_position_controller br_joint_position_controller joint_state_controller"/>
 
 
   <!-- convert joint states to TF transforms for rviz, etc -->
