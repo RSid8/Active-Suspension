@@ -23,27 +23,15 @@
 #include "pcl/common/angles.h"
 #include <math.h>
 #include <signal.h>
-#include <std_msgs/String.h>
-#include <sstream>
-
 
 using namespace std; 
 
 ros::Publisher pub;
-ros::Publisher cluster_marker;
-ros::Publisher chatter_pub;
+ros::Publisher centroid_pub;
 
 
 
-long mag = 0.500;
-long dir = 0.000; 
-
-float mappy(float x, float in_min, float in_max, float out_min, float out_max)
-{
-  return float((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min);
-}
-
-// PASSTHROUGH -> VOXEL -> RANSAC -> CLUSTER -> BOUNDING BOX
+// PASSTHROUGH -> VOXEL -> RANSAC -> CLUSTER -> CENTROID
 
 void 
 cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
@@ -178,135 +166,22 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
        
         }
 
-        /*/5) STATISTICAL OUTLIER REMOVAL
 
-        pcl::PointCloud<pcl::PointXYZRGB> *statistical_cloud_filtered = new pcl::PointCloud<pcl::PointXYZRGB>;
-        pcl::PointCloud<pcl::PointXYZRGB>::Ptr statisticalCloudFilteredPtr (statistical_cloud_filtered);
 
-        pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB>stat;
-        stat.setInputCloud(euclideanCloudFilteredPtr);
-        stat.setMeanK(50);
-        stat.setStddevMulThresh(1.0);
-        stat.filter(*statisticalCloudFilteredPtr);*/
-
-        //6) MARKERS OVER DETECTED CLUSTER
+        //5) COMPUTE CENTROID
         Eigen::Vector4f centroid;
-        geometry_msgs::Pose pose;
-        Eigen::Vector4f min;
-        Eigen::Vector4f max;
+        geometry_msgs::PoseStamped centroid_pose;
 
         pcl::compute3DCentroid (*euclideanCloudFilteredPtr, centroid);
-        pcl::getMinMax3D (*euclideanCloudFilteredPtr, min, max);
-
-        pose.position.x = centroid[0];
-        pose.position.y = centroid[1];
-        pose.position.z = centroid[2];
-          
-        Eigen::Matrix3f covarianceMatrix;
-        pcl::computeCovarianceMatrix(*euclideanCloudFilteredPtr, centroid, covarianceMatrix);
-        Eigen::Matrix3f eigenVectors;
-        Eigen::Vector3f eigenValues;
-        pcl::eigen33(covarianceMatrix, eigenVectors, eigenValues);
 
 
-        geometry_msgs::Point point1;
-        point1.x = eigenVectors.col(2)[0] + pose.position.x;
-        point1.y = eigenVectors.col(2)[1] + pose.position.y;
-        point1.z = eigenVectors.col(2)[2] + pose.position.z;
-
-        geometry_msgs::Point maxPoint1;
-        geometry_msgs::Point minPoint1;
-
-        maxPoint1.x = std::max(pose.position.x, point1.x);
-        maxPoint1.y = std::max(pose.position.y, point1.y);
-        maxPoint1.z = std::max(pose.position.z, point1.z);
-
-        minPoint1.x = std::min(pose.position.x, point1.x);
-        minPoint1.y = std::min(pose.position.y, point1.y);
-        minPoint1.z = std::min(pose.position.z, point1.z);
-
-        geometry_msgs::Point point2;
-        point2.x = eigenVectors.col(0)[0] + pose.position.x;
-        point2.y = eigenVectors.col(0)[1] + pose.position.y;
-        point2.z = eigenVectors.col(0)[2] + pose.position.z;
-
-
-        geometry_msgs::Point maxPoint2;
-        geometry_msgs::Point minPoint2;
-
-        maxPoint2.x = std::max(pose.position.x, point2.x);
-        maxPoint2.y = std::max(pose.position.y, point2.y);
-        maxPoint2.z = std::max(pose.position.z, point2.z);
-
-        minPoint2.x = std::min(pose.position.x, point2.x);
-        minPoint2.y = std::min(pose.position.y, point2.y);
-        minPoint2.z = std::min(pose.position.z, point2.z);
-
-        double slope = (pose.position.z - point2.z)/(pose.position.y - point2.y);
-
-        float theta1 = 0;
-        float cosTheta1 = 0;
-        float sinTheta1 = 0;
-
-        cosTheta1 = (maxPoint1.y - minPoint1.y)/(sqrt(pow((maxPoint1.x - minPoint1.x),2) + pow((maxPoint1.y - minPoint1.y),2) + pow((maxPoint1.z - minPoint1.z),2)));
-        sinTheta1 = sqrt(1 - (pow(cosTheta1, 2)));
-
-        if(slope > 0)
-              theta1 = atan2(sinTheta1, cosTheta1) * -1.0;
-        else
-              theta1 = atan2(sinTheta1, cosTheta1);
-
+        centroid_pose.header.frame_id = "rs200_camera_rviz";
+        centroid_pose.pose.position.x = centroid[0];
+        centroid_pose.pose.position.y = centroid[1];
+        centroid_pose.pose.position.z = centroid[2];
           
 
-        //theta1-=1.5707;
-
-        geometry_msgs::Quaternion quaternion = tf::createQuaternionMsgFromYaw(theta1);
-        pose.orientation = quaternion;
-
-        uint32_t shape = visualization_msgs::Marker::CUBE;
-        visualization_msgs::Marker marker;
-        marker.header.frame_id = "rs200_camera_rviz";
-        marker.header.stamp = ros::Time::now();
-
-        marker.ns = "rs200_camera_rviz";
-        float r = 1, g = 0, b = 0;
-        int id =1;
-        marker.id = id;
-        marker.type = shape;
-        marker.action = visualization_msgs::Marker::ADD;
-
-        marker.pose.position.x = pose.position.x;
-        marker.pose.position.y = pose.position.y;
-        marker.pose.position.z = pose.position.z;
-        marker.pose.orientation.x = pose.orientation.x;
-        marker.pose.orientation.y = pose.orientation.y;
-        marker.pose.orientation.z = pose.orientation.z;
-        marker.pose.orientation.w = pose.orientation.w;
-
-        marker.scale.x = (max[0]-min[0]);
-        marker.scale.y = (max[1]-min[1]);
-        marker.scale.z = (max[2]-min[2]);
-
-        if (marker.scale.x ==0)
-          marker.scale.x=0.1;
-
-        if (marker.scale.y ==0)
-          marker.scale.y=0.1;
-
-        if (marker.scale.z ==0)
-          marker.scale.z=0.1;
-
-        marker.color.r = r;
-        marker.color.g = g;
-        marker.color.b = b;
-        marker.color.a = 0.5;
-
-        marker.lifetime = ros::Duration();
-        //   marker.lifetime = ros::Duration(0.5);
-        cluster_marker.publish(marker); 
-        
-       
-
+      
         // convert to rosmsg and publish:
         sensor_msgs::PointCloud2::Ptr output (new sensor_msgs::PointCloud2 ());
         pcl::toROSMsg(*euclideanCloudFilteredPtr, *output);
@@ -318,54 +193,26 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
 
         ///////////////////////////////////////////////////////////////////////////////////
 
-        
-        centroid[0] = round( centroid[0] * 1000.0 ) / 1000.0;
-        centroid[1] = round( centroid[1] * 1000.0 ) / 1000.0;
-        centroid[2] = round( centroid[2] * 1000.0 ) / 1000.0;
-        
-        // if (centroid[0] < -1.5)
-        //    centroid[0] = -1.500;
-        // if (centroid[0] > 1.5)
-        //    centroid[0] = 1.500;
 
 
-        // if (centroid[0] < 0)
-        //  {ROS_INFO("RIGHT");
-        //  centroid[0] = mappy(centroid[0], -1.500, 0.000, 0.000, 90.000);}
-
-        // else if (centroid[0] > 0)
-        //  {ROS_INFO("LEFT");
-        //  centroid[0] = mappy(centroid[0], 0.000, 1.500, -90.000, 0.000);}
-        // else
-        //  ROS_INFO("FORWARD");
-
-        // centroid[2] = mappy(centroid[2], 0.200, 3.000, 0.500, 1.000);
-        
-        
-        std_msgs::String msg;
-        std::stringstream ss;
-        ss<<centroid[0]<<","<<centroid[1]<<","<<centroid[2]<<"\0";
-        msg.data = ss.str();
-        chatter_pub.publish(msg);
-
-        centroid[0] = 0.000;
-        centroid[1] = 0.000;
-        centroid[2] = 0.000;
-
+        centroid_pose.pose.orientation.x = 0.0;
+        centroid_pose.pose.orientation.y = -0.7071;
+        centroid_pose.pose.orientation.z = 0.0;
+        centroid_pose.pose.orientation.w = 0.7071;
+        centroid_pub.publish(centroid_pose);
 
     }
 
   else
   {
-        std_msgs::String msg;
-        std::stringstream ss;
-        ss<<"None,None,None"<<"\0";
-        msg.data = ss.str();
-        chatter_pub.publish(msg);
+
+        geometry_msgs::PoseStamped centroid_pose;
+        centroid_pose.header.frame_id = "rs200_camera_rviz";
+        centroid_pose.pose.position.x = -10;
+        centroid_pose.pose.position.y = -10;
+        centroid_pose.pose.position.z = -10;
+        centroid_pub.publish(centroid_pose);
   }
-
-
-
 
 
 }
@@ -384,8 +231,7 @@ main (int argc, char** argv)
 
   // Create a ROS publisher for the output point cloud
   pub = nh.advertise<sensor_msgs::PointCloud2> ("/filtered_pcl", 1);
-  cluster_marker = nh.advertise<visualization_msgs::Marker> ("cluster_marker", 1);
-  chatter_pub = nh.advertise<std_msgs::String>("/centroid_dimensions", 1000);
+  centroid_pub = nh.advertise<geometry_msgs::PoseStamped>("/centroid_point", 1000);
 
   // Spin
   ros::spin ();

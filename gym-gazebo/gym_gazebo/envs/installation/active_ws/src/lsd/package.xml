@@ -37,6 +37,7 @@ for lsd robot</p>
   <depend>rviz</depend>
   <depend>joint_state_publisher</depend>
   <depend>gazebo</depend>
+  <depend>geometry_msgs</depend>
 
   <export>
     <gazebo_ros

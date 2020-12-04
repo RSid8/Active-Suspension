@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
     rostest
     pcl_conversions
     pcl_ros
+    geometry_msgs
 
 )
 find_package(Boost REQUIRED COMPONENTS thread)
@@ -29,6 +30,7 @@ catkin_package(
     DEPENDS
         roscpp
         gazebo_ros
+        geometry_msgs
 )
 
 include_directories(
