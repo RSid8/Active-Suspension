@@ -35,9 +35,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.y_displacement=0
         self.ground_clearance=0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(5,), dtype=np.float32)
+        self.observation_space = spaces.Box(-inf, inf, shape=(4,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(-20, 30, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(-40, 40, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.chassis_angle = 0
         self.done = False
@@ -73,7 +73,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -3.5
+        vel_cmd.linear.x = -1.5
         vel_cmd.angular.z =0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -120,7 +120,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         
     def get_observation(self):
-        self.observation_space = [self.pitch, self.roll, 100*self.ground_clearance, self.actual_speed, self.y_displacement]
+        self.observation_space = [self.pitch, self.roll, self.actual_speed, self.y_displacement]
         return self.observation_space
 
     def step(self, action):
@@ -134,12 +134,12 @@ class LsdEnv(gazebo_env.GazeboEnv):
         
         self.forward()
 
-        self.joint_1_publisher.publish(action[0])
-        self.joint_2_publisher.publish(action[1])
-        self.joint_3_publisher.publish(action[2])
-        self.joint_4_publisher.publish(action[3])
+        self.joint_1_publisher.publish(radians(action[0]))
+        self.joint_2_publisher.publish(radians(action[1]))
+        self.joint_3_publisher.publish(radians(action[2]))
+        self.joint_4_publisher.publish(radians(action[3]))
 
-        time.sleep(2.5)
+        time.sleep(1)
         # publish till the action taken is completed      
         observation_ = self.observation_space
 
