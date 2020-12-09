@@ -1730,8 +1730,8 @@
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
-          <lower>-0.1221</lower>               <!--Joint Limits -7 to 173 --> 
-          <upper>3.01941</upper>
+          <lower>-3.0194</lower>               <!--Joint Limits -173 to 20 --> 
+          <upper>0.35</upper>
           <effort>-1</effort>
           <velocity>-1</velocity>
         </limit>
@@ -1762,8 +1762,8 @@
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
-          <lower>-0.1221</lower>               <!--Joint Limits -7 to 173 --> 
-          <upper>3.01941</upper>
+          <lower>-3.0194</lower>               <!--Joint Limits -173 to 20 --> 
+          <upper>0.35</upper>
           <effort>-1</effort>
           <velocity>-1</velocity>
         </limit>
