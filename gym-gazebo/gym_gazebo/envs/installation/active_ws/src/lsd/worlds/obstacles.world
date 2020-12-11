@@ -26,6 +26,26 @@
       <pose>11 0 0.175 0 0 0</pose>
     </include>
 
+
+    <include>
+      <uri>model://step</uri>
+      <name>step3</name>
+      <pose>20 0 0.175 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://step</uri>
+      <name>step4</name>
+      <pose>28 0 0.175 0 0 0</pose>
+    </include>
+
+
+    <include>
+      <uri>model://step</uri>
+      <name>step5</name>
+      <pose>40 0 0.175 0 0 0</pose>
+    </include>
+
 <scene>
   <sky>
     <clouds>

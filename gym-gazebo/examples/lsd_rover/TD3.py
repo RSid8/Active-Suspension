@@ -122,7 +122,7 @@ class ActorNetwork(nn.Module):
 
 #####################################################################################################################################################################################################################
 class Agent():
-    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=5, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=40):
+    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=20, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=40):
         self.gamma = gamma
         self.tau = tau
         self.max_action = env.action_space.high
@@ -300,8 +300,10 @@ if __name__ == '__main__':
         done = False
         score = 0
         while not done:
+        
             action = agent.choose_action(observation)
             p=p+1
+            
             observation_, reward, done, info = env.step(action)
 
             if(p==50):
@@ -315,9 +317,7 @@ if __name__ == '__main__':
         score_history.append(score)
         avg_score = np.mean(score_history[-100:])
 
-        if avg_score > best_score:
-            best_score = avg_score
-            #agent.save_models()
+        agent.save_models()
 
         print('episode ', i, 'score %.1f' % score,
                 'average score %.1f' % avg_score)

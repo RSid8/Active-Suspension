@@ -25,7 +25,7 @@ if __name__ == '__main__':
 	done=False
 
 	#fl,fr,bl,br
-	a=np.array([0,0,0,-35])
+	a=np.array([0,50,0,0])
 	
 	while not done:
 

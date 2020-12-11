@@ -74,6 +74,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         vel_cmd = Twist()
         vel_cmd.linear.x = -1.5
+        vel_cmd.linear.y = 0
+
         vel_cmd.angular.z =0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -159,6 +161,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
         time.sleep(1)
         # publish till the action taken is completed      
         observation_ = self.observation_space
+        print(self.observation_space[3])
+
+        if(abs(observation_[3])>10):
+            self.done= True
 
         self.get_reward()
 
@@ -171,14 +177,15 @@ class LsdEnv(gazebo_env.GazeboEnv):
         if(self.pitch>17):
             self.reward-=5
 
-        elif(self.y_displacement>5):
-            self.reward-=5
+        elif(abs(self.y_displacement)>3):
+            self.reward-=20
+        elif(abs(self.actual_speed)<1):
+            self.reward-=10  
 
-        elif(self.actual_speed<0.4):
-            self.reward-=10    
-        
-        elif(28<(100*self.ground_clearance)<33 and abs(self.pitch)<5):
-            self.reward+=10     
+        elif(abs(self.actual_speed)>1):
+            self.reward+=2    
+
+    
     
     def reset(self):
 
