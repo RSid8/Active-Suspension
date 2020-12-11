@@ -67,10 +67,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
         self.unpause = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
         self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
-        self.tfBuffer = tf2_ros.Buffer()
-        self.listener = tf2_ros.TransformListener(self.tfBuffer)
         rospy.Subscriber("/centroid_point", PoseStamped, self.callback_point)
-        self.rate = rospy.Rate(10)
+        self.rate = rospy.Rate(50)
 
     def forward(self):
 
@@ -119,20 +117,23 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.actual_speed=msg.twist.twist.linear.x
         self.y_displacement=msg.pose.pose.position.y
 
-    def transform_centroid(self):
+    """def transform_centroid(self):
+        self.tfBuffer = tf2_ros.Buffer()
+        self.listener = tf2_ros.TransformListener(self.tfBuffer)
         while not rospy.is_shutdown():
             try:
                 trans = self.tfBuffer.lookup_transform("base_link", "r200_camera_rviz", 
                     rospy.Time(0))
             except(tf2_ros.LookupException, tf2_ros.ConnectivityException, 
-                    tf2_ros.ExtrapolationException):
+                    tf2_ros.ExtrapolationException) as e:
                     self.rate.sleep()
+                    print(e)
                     continue
             pose_transformed = tf2_geometry_msgs.do_transform_pose(self.centroid, trans)
-            return pose_transformed
+            return pose_transformed"""
 
     def get_observation(self):
-        pose_transformed = self.transform_centroid()
+        pose_transformed = self.centroid
         self.obstacle_distance = pose_transformed.pose.position.x
         self.obstacle_height = 2*pose_transformed.pose.position.y
         self.obstacle_offset = pose_transformed.pose.position.z
