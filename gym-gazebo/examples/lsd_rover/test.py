@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import gym
 import gym_gazebo
 import time
+import rospy
 from math import radians
 
 
@@ -20,12 +21,11 @@ if __name__ == '__main__':
 	
 	env = gym.make('GazeboMarsLsdForce-Lidar-v0')
 	
-	
 	time.sleep(10)
 	done=False
 
 	#fl,fr,bl,br
-	a=np.array([radians(35),radians(0),radians(0),radians(0)])
+	a=np.array([0,0,0,-35])
 	
 	while not done:
 

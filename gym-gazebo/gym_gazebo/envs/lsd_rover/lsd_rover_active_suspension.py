@@ -15,7 +15,9 @@ import rospkg
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
 import time
-
+import tf2_ros
+import tf2_geometry_msgs
+from tf2_geometry_msgs import PoseStamped
 rospack = rospkg.RosPack()
 
 class LsdEnv(gazebo_env.GazeboEnv):
@@ -35,23 +37,20 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.y_displacement=0
         self.ground_clearance=0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(4,), dtype=np.float32)
+        self.observation_space = spaces.Box(-inf, inf, shape=(7,), dtype=np.float32)
         self.orientation_list = []
         self.action_space = spaces.Box(-40, 40, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
+        self.obstacle_height = 0
+        self.obstacle_offset = 0
         self.chassis_angle = 0
+        self.actual_speed = 0
         self.done = False
         self.package_path = rospack.get_path('lsd')
 
-
         rospy.Subscriber("/imu", Imu, self.callback_imu)
 
-        rospy.Subscriber("/sonar", Range, self.callback_sonar)
-
         rospy.Subscriber("/odom", Odometry, self.callback_pose)
-
-        #rospy.Subscriber("/r200/camera/depth_registered/points", Pointcloud2, self.callback_Pointcloud2)
-
 
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
 
@@ -68,7 +67,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
         self.unpause = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
         self.reset_proxy = rospy.ServiceProxy('/gazebo/reset_simulation', Empty)
-
+        self.tfBuffer = tf2_ros.Buffer()
+        self.listener = tf2_ros.TransformListener(self.tfBuffer)
+        rospy.Subscriber("/centroid_point", PoseStamped, self.callback_point)
+        self.rate = rospy.Rate(10)
 
     def forward(self):
 
@@ -109,18 +111,33 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.roll = degrees(self.roll)
         self.yaw = degrees(self.yaw)
 
-    def callback_sonar(self, msg):
-
-        self.ground_clearance=msg.range
+    def callback_point(self, msg):
+        self.centroid = msg
 
 
     def callback_pose(self, msg):
         self.actual_speed=msg.twist.twist.linear.x
         self.y_displacement=msg.pose.pose.position.y
 
-        
+    def transform_centroid(self):
+        while not rospy.is_shutdown():
+            try:
+                trans = self.tfBuffer.lookup_transform("base_link", "r200_camera_rviz", 
+                    rospy.Time(0))
+            except(tf2_ros.LookupException, tf2_ros.ConnectivityException, 
+                    tf2_ros.ExtrapolationException):
+                    self.rate.sleep()
+                    continue
+            pose_transformed = tf2_geometry_msgs.do_transform_pose(self.centroid, trans)
+            return pose_transformed
+
     def get_observation(self):
-        self.observation_space = [self.pitch, self.roll, self.actual_speed, self.y_displacement]
+        pose_transformed = self.transform_centroid()
+        self.obstacle_distance = pose_transformed.pose.position.x
+        self.obstacle_height = 2*pose_transformed.pose.position.y
+        self.obstacle_offset = pose_transformed.pose.position.z
+        self.observation_space = [self.pitch, self.roll, self.actual_speed, self.y_displacement, 
+            self.obstacle_distance, self.obstacle_height, self.obstacle_offset]
         return self.observation_space
 
     def step(self, action):
@@ -133,7 +150,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
             print ("/gazebo/unpause_physics service call failed")
         
         self.forward()
-
         self.joint_1_publisher.publish(radians(action[0]))
         self.joint_2_publisher.publish(radians(action[1]))
         self.joint_3_publisher.publish(radians(action[2]))
