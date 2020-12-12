@@ -122,7 +122,7 @@ class ActorNetwork(nn.Module):
 
 #####################################################################################################################################################################################################################
 class Agent():
-    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=20, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=40):
+    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=20, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=30):
         self.gamma = gamma
         self.tau = tau
         self.max_action = env.action_space.high

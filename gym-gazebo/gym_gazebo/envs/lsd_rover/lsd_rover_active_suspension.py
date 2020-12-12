@@ -39,7 +39,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.reward = 0
         self.observation_space = spaces.Box(-inf, inf, shape=(7,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(-40, 40, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(-30, 10, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.obstacle_height = 0
         self.obstacle_offset = 0
@@ -73,7 +73,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -1.5
+        vel_cmd.linear.x = -2.5
         vel_cmd.linear.y = 0
 
         vel_cmd.angular.z =0
@@ -160,11 +160,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         time.sleep(1)
         # publish till the action taken is completed      
-        observation_ = self.observation_space
-        print(self.observation_space[3])
+        observation_ = self.get_observation()
 
-        if(abs(observation_[3])>10):
-            self.done= True
 
         self.get_reward()
 
@@ -177,12 +174,12 @@ class LsdEnv(gazebo_env.GazeboEnv):
         if(self.pitch>17):
             self.reward-=5
 
-        elif(abs(self.y_displacement)>3):
+        elif(abs(self.y_displacement)>1):
             self.reward-=20
-        elif(abs(self.actual_speed)<1):
+        elif(abs(self.actual_speed)<0.8):
             self.reward-=10  
 
-        elif(abs(self.actual_speed)>1):
+        elif(abs(self.actual_speed)>0.8):
             self.reward+=2    
 
     
