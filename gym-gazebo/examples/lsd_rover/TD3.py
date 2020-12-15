@@ -122,7 +122,7 @@ class ActorNetwork(nn.Module):
 
 #####################################################################################################################################################################################################################
 class Agent():
-    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=20, n_actions=2, max_size=1000000, layer1_size=400, layer2_size=300, batch_size=100, noise=30):
+    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=950000, n_actions=4, max_size=10000000, layer1_size=400, layer2_size=300, batch_size=100, noise=30):
         self.gamma = gamma
         self.tau = tau
         self.max_action = env.action_space.high
@@ -285,7 +285,7 @@ if __name__ == '__main__':
             input_dims=env.observation_space.shape, tau=0.005,   ##observation_space.shape= numpy array for size 7 or 9
             env=env, batch_size=100, layer1_size=400, layer2_size=300,
             n_actions=4)
-    n_games = 1000
+    n_games = 8000
     filename = 'plots/' + 'LsdActiveSuspension_' + str(n_games) + '_games.png'
 
     best_score = env.reward_range[0]
@@ -306,7 +306,7 @@ if __name__ == '__main__':
             
             observation_, reward, done, info = env.step(action)
 
-            if(p==50):
+            if(p==220):
                 done=True
             else:
                 pass        

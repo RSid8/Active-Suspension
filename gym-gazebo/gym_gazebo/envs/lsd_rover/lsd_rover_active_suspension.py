@@ -25,21 +25,16 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         gazebo_env.GazeboEnv.__init__(self, "custom_world.launch")
 
-        self.force_fl = 0
-        self.force_fr = 0
-        self.force_ml = 0
-        self.force_mr = 0
-        self.force_rl = 0
-        self.force_rr = 0
         self.pitch = 0
         self.roll = 0
         self.yaw = 0
         self.y_displacement=0
+        self.x_displacement=0
         self.ground_clearance=0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(7,), dtype=np.float32)
+        self.observation_space = spaces.Box(-inf, inf, shape=(8,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(-30, 10, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(-30, 15, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.obstacle_height = 0
         self.obstacle_offset = 0
@@ -73,7 +68,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -2.5
+        vel_cmd.linear.x = -1.5
+
         vel_cmd.linear.y = 0
 
         vel_cmd.angular.z =0
@@ -118,6 +114,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def callback_pose(self, msg):
         self.actual_speed=msg.twist.twist.linear.x
         self.y_displacement=msg.pose.pose.position.y
+        self.x_displacement=msg.pose.pose.position.x
 
     """def transform_centroid(self):
         self.tfBuffer = tf2_ros.Buffer()
@@ -140,7 +137,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.obstacle_height = 2*pose_transformed.pose.position.y
         self.obstacle_offset = pose_transformed.pose.position.z
         self.observation_space = [self.pitch, self.roll, self.actual_speed, self.y_displacement, 
-            self.obstacle_distance, self.obstacle_height, self.obstacle_offset]
+            self.obstacle_distance, self.obstacle_height, self.obstacle_offset, self.x_displacement]
         return self.observation_space
 
     def step(self, action):
@@ -157,8 +154,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.joint_2_publisher.publish(radians(action[1]))
         self.joint_3_publisher.publish(radians(action[2]))
         self.joint_4_publisher.publish(radians(action[3]))
-
-        time.sleep(1)
+        #print(self.x_displacement)
+        time.sleep(0.5)
         # publish till the action taken is completed      
         observation_ = self.get_observation()
 
@@ -171,16 +168,23 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
     def get_reward(self):
 
-        if(self.pitch>17):
-            self.reward-=5
-
-        elif(abs(self.y_displacement)>1):
-            self.reward-=20
+        self.reward=0 
+        if(abs(self.pitch>17)):
+            self.reward-=10
+        if(5<(self.x_displacement)<5.5):
+            self.reward+=500
+        elif(11<(self.x_displacement)<11.5):
+            self.reward+=20
+        elif(19<(self.x_displacement)<20):
+            self.reward+=20
+        elif(26<(self.x_displacement)<27):
+            self.reward+=20
+        elif(38<(self.x_displacement)<39):
+            self.reward+=20      
+        elif(abs(self.y_displacement)>4):
+            self.reward-=200
         elif(abs(self.actual_speed)<0.8):
-            self.reward-=10  
-
-        elif(abs(self.actual_speed)>0.8):
-            self.reward+=2    
+            self.reward-=20  
 
     
     
@@ -199,7 +203,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.joint_3_publisher.publish(0)
         self.joint_4_publisher.publish(0)
 
-        time.sleep(5)
+        time.sleep(3)
 
         # unpause simulation to make an observation and reset the values
         rospy.wait_for_service('/gazebo/unpause_physics')
