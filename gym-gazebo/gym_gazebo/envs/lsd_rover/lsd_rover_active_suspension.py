@@ -162,15 +162,15 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         self.get_reward()
 
-        
-        state_ = (observation_, self.reward, self.done, {})
-        return state_
+        return observation_, self.reward, self.done, {}
 
     def get_reward(self):
 
         self.reward=0 
         if(abs(self.pitch>17)):
             self.reward-=10
+        if(abs(self.pitch>25)):
+            self.done=True
         if(5<(self.x_displacement)<5.5):
             self.reward+=500
         elif(11<(self.x_displacement)<11.5):
