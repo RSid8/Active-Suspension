@@ -202,7 +202,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.joint_3_publisher.publish(0)
         self.joint_4_publisher.publish(0)
 
-        time.sleep(2)
+        time.sleep(3)
 
         # unpause simulation to make an observation and reset the values
         rospy.wait_for_service('/gazebo/unpause_physics')
