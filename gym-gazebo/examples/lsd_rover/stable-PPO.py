@@ -14,6 +14,6 @@ from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_checker import check_env
 
-env = make_vec_env('GazeboMarsLsdForce-Lidar-v0', n_envs=2)
+env=gym.make('GazeboMarsLsdForce-Lidar-v0')
 check_env(env)
 
