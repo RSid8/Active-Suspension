@@ -179,9 +179,13 @@ class LsdEnv(gazebo_env.GazeboEnv):
         elif(26<(self.x_displacement)<27):
             self.reward+=20
         elif(38<(self.x_displacement)<39):
-            self.reward+=20      
+            self.reward+=20
+        elif(abs(self.x_displacement)>40):
+            self.done=True      
         elif(abs(self.y_displacement)>4):
             self.reward-=200
+        elif(abs(self.y_displacement)>5):
+            self.done=True
         elif(abs(self.actual_speed)<0.8):
             self.reward-=20  
 
