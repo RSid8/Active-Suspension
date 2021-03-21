@@ -22,7 +22,6 @@ rospack = rospkg.RosPack()
 
 class LsdEnv(gazebo_env.GazeboEnv):
     def __init__(self):
-
         gazebo_env.GazeboEnv.__init__(self, "custom_world.launch")
 
         self.pitch = 0
@@ -32,9 +31,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.x_displacement=0
         self.ground_clearance=0
         self.reward = 0
-        self.observation_space = spaces.Box(-inf, inf, shape=(8,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-50,high=50, shape=(8,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(-30, 15, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(low=-1,high=1, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.obstacle_height = 0
         self.obstacle_offset = 0
@@ -136,9 +135,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.obstacle_distance = pose_transformed.pose.position.x
         self.obstacle_height = 2*pose_transformed.pose.position.y
         self.obstacle_offset = pose_transformed.pose.position.z
-        self.observation_space = [self.pitch, self.roll, self.actual_speed, self.y_displacement, 
+        observation = [self.pitch, self.roll, self.actual_speed, self.y_displacement, 
             self.obstacle_distance, self.obstacle_height, self.obstacle_offset, self.x_displacement]
-        return self.observation_space
+        return observation
 
     def step(self, action):
 
@@ -150,19 +149,19 @@ class LsdEnv(gazebo_env.GazeboEnv):
             print ("/gazebo/unpause_physics service call failed")
         
         self.forward()
-        self.joint_1_publisher.publish(radians(action[0]))
-        self.joint_2_publisher.publish(radians(action[1]))
-        self.joint_3_publisher.publish(radians(action[2]))
-        self.joint_4_publisher.publish(radians(action[3]))
+        self.joint_1_publisher.publish(radians(30*action[0]))
+        self.joint_2_publisher.publish(radians(30*action[1]))
+        self.joint_3_publisher.publish(radians(30*action[2]))
+        self.joint_4_publisher.publish(radians(30*action[3]))
         #print(self.x_displacement)
-        time.sleep(0.5)
+        time.sleep(0.1)
         # publish till the action taken is completed      
         observation_ = self.get_observation()
 
 
         self.get_reward()
 
-        return observation_, self.reward, self.done, {}
+        return np.array(observation_,dtype=np.float32), self.reward, self.done, {}
 
     def get_reward(self):
 
@@ -203,7 +202,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.joint_3_publisher.publish(0)
         self.joint_4_publisher.publish(0)
 
-        time.sleep(3)
+        time.sleep(2)
 
         # unpause simulation to make an observation and reset the values
         rospy.wait_for_service('/gazebo/unpause_physics')
@@ -223,4 +222,4 @@ class LsdEnv(gazebo_env.GazeboEnv):
         except rospy.ServiceException:
             print("/gazebo/pause_physics service call failed")
 
-        return initial_reading
+        return np.array(initial_reading, dtype=np.float32)
