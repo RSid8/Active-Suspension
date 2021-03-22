@@ -74,136 +74,154 @@ cloud_cb (const sensor_msgs::PointCloud2ConstPtr& input)
   sor.filter (*voxelCloudFilteredPtr);
 
 
-  //3) RANSAC
+
+  if (voxelCloudFilteredPtr->size() > 0)
+  {
+  	 //3) RANSAC
     // create a pcl object to hold the ransac filtered results
-  pcl::PointCloud<pcl::PointXYZRGB> *ransac_cloud_filtered = new pcl::PointCloud<pcl::PointXYZRGB>;
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr ransacCloudFilteredPtr (ransac_cloud_filtered);
+	  pcl::PointCloud<pcl::PointXYZRGB> *ransac_cloud_filtered = new pcl::PointCloud<pcl::PointXYZRGB>;
+	  pcl::PointCloud<pcl::PointXYZRGB>::Ptr ransacCloudFilteredPtr (ransac_cloud_filtered);
 
 
-  // perform ransac planar filtration to remove inliers
-  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
-  // Create the segmentation object
-  pcl::SACSegmentation<pcl::PointXYZRGB> seg;
-  // Optional
-  seg.setOptimizeCoefficients (true);
-  // Mandatory
-  seg.setModelType (pcl::SACMODEL_PLANE);
-  seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setDistanceThreshold (0.04);
-  seg.setInputCloud (voxelCloudFilteredPtr);
-  seg.segment (*inliers, *coefficients);
+	  // perform ransac planar filtration to remove inliers
+	  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+	  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
+	  // Create the segmentation object
+	  pcl::SACSegmentation<pcl::PointXYZRGB> seg;
+	  // Optional
+	  seg.setOptimizeCoefficients (true);
+	  // Mandatory
+	  seg.setModelType (pcl::SACMODEL_PLANE);
+	  seg.setMethodType (pcl::SAC_RANSAC);
+	  seg.setDistanceThreshold (0.04);
+	  seg.setInputCloud (voxelCloudFilteredPtr);
+	  seg.segment (*inliers, *coefficients);
 
 
-  // Create the filtering object
-  pcl::ExtractIndices<pcl::PointXYZRGB> extract;
+	  // Create the filtering object
+	  pcl::ExtractIndices<pcl::PointXYZRGB> extract;
 
-  extract.setInputCloud (voxelCloudFilteredPtr);
-  extract.setIndices (inliers);
-  extract.setNegative (true);
-  extract.filter (*ransacCloudFilteredPtr);
-
-
+	  extract.setInputCloud (voxelCloudFilteredPtr);
+	  extract.setIndices (inliers);
+	  extract.setNegative (true);
+	  extract.filter (*ransacCloudFilteredPtr);
 
 
+	  if (ransacCloudFilteredPtr->size() > 0)
+	    {
 
-  if (ransacCloudFilteredPtr->size() > 0)
-    {
+	       //4) EUCLIDEAN CLUSTERING
 
-       //4) EUCLIDEAN CLUSTERING
+	        // Create the KdTree object for the search method of the extraction
 
-        // Create the KdTree object for the search method of the extraction
+	        pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
+	        tree->setInputCloud (ransacCloudFilteredPtr);
 
-        pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
-        tree->setInputCloud (ransacCloudFilteredPtr);
+	        // create the extraction object for the clusters
+	        std::vector<pcl::PointIndices> cluster_indices;
+	        pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
+	        // specify euclidean cluster parameters
+	        ec.setClusterTolerance (0.05); // 2cm
+	        ec.setMinClusterSize (300);
+	        ec.setMaxClusterSize (10000);
+	        ec.setSearchMethod (tree);
+	        ec.setInputCloud (ransacCloudFilteredPtr);
+	        // exctract the indices pertaining to each cluster and store in a vector of pcl::PointIndices
+	        ec.extract (cluster_indices);
 
-        // create the extraction object for the clusters
-        std::vector<pcl::PointIndices> cluster_indices;
-        pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
-        // specify euclidean cluster parameters
-        ec.setClusterTolerance (0.05); // 2cm
-        ec.setMinClusterSize (300);
-        ec.setMaxClusterSize (10000);
-        ec.setSearchMethod (tree);
-        ec.setInputCloud (ransacCloudFilteredPtr);
-        // exctract the indices pertaining to each cluster and store in a vector of pcl::PointIndices
-        ec.extract (cluster_indices);
+	        
 
-        
+	       //iterators
 
-       //iterators
+	        std::vector<pcl::PointIndices>::const_iterator it;
+	        std::vector<int>::const_iterator pit;
 
-        std::vector<pcl::PointIndices>::const_iterator it;
-        std::vector<int>::const_iterator pit;
+	        pcl::PointCloud<pcl::PointXYZRGB> *euclidean_cloud_filtered = new pcl::PointCloud<pcl::PointXYZRGB>;
+	        pcl::PointCloud<pcl::PointXYZRGB>::Ptr euclideanCloudFilteredPtr (euclidean_cloud_filtered);
 
-        pcl::PointCloud<pcl::PointXYZRGB> *euclidean_cloud_filtered = new pcl::PointCloud<pcl::PointXYZRGB>;
-        pcl::PointCloud<pcl::PointXYZRGB>::Ptr euclideanCloudFilteredPtr (euclidean_cloud_filtered);
-
-        pcl::PointCloud<pcl::PointXYZRGB> *cluster = new pcl::PointCloud<pcl::PointXYZRGB>;
-        pcl::PointCloud<pcl::PointXYZRGB>::Ptr clusterPtr (cluster);
+	        pcl::PointCloud<pcl::PointXYZRGB> *cluster = new pcl::PointCloud<pcl::PointXYZRGB>;
+	        pcl::PointCloud<pcl::PointXYZRGB>::Ptr clusterPtr (cluster);
 
 
-        
+	        
 
-        //int number_clusters =0;
-        
-        // here, cluster_indices is a vector of indices for each cluster. iterate through each indices object to work with them separately
-        for(it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
-        {
-           //number_clusters = (int) cluster_indices.size();
-           //std::cout << ("Number of clusters found: %d",number_clusters);
+	        //int number_clusters =0;
+	        
+	        // here, cluster_indices is a vector of indices for each cluster. iterate through each indices object to work with them separately
+	        for(it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
+	        {
+	           //number_clusters = (int) cluster_indices.size();
+	           //std::cout << ("Number of clusters found: %d",number_clusters);
 
-          // now we are in a vector of indices pertaining to a single cluster.
+	          // now we are in a vector of indices pertaining to a single cluster.
 
-          for(pit = it->indices.begin(); pit != it->indices.end(); pit++)
-            clusterPtr->points.push_back(ransacCloudFilteredPtr->points[*pit]);
-               
-           
-          clusterPtr->width = clusterPtr->points.size ();
-          clusterPtr->height = 1;
-          clusterPtr->is_dense = true; 
-          *euclideanCloudFilteredPtr += *clusterPtr;
-       
-        }
+	          for(pit = it->indices.begin(); pit != it->indices.end(); pit++)
+	            clusterPtr->points.push_back(ransacCloudFilteredPtr->points[*pit]);
+	               
+	           
+	          clusterPtr->width = clusterPtr->points.size ();
+	          clusterPtr->height = 1;
+	          clusterPtr->is_dense = true; 
+	          *euclideanCloudFilteredPtr += *clusterPtr;
+	       
+	        }
 
 
 
-        //5) COMPUTE CENTROID
-        Eigen::Vector4f centroid;
-        geometry_msgs::PoseStamped centroid_pose;
+	        //5) COMPUTE CENTROID
+	        Eigen::Vector4f centroid;
+	        geometry_msgs::PoseStamped centroid_pose;
 
-        pcl::compute3DCentroid (*euclideanCloudFilteredPtr, centroid);
-
-
-        centroid_pose.header.frame_id = "rs200_camera_rviz";
-        centroid_pose.pose.position.x = centroid[0];
-        centroid_pose.pose.position.y = centroid[1];
-        centroid_pose.pose.position.z = centroid[2];
-          
-
-      
-        // convert to rosmsg and publish:
-        sensor_msgs::PointCloud2::Ptr output (new sensor_msgs::PointCloud2 ());
-        pcl::toROSMsg(*euclideanCloudFilteredPtr, *output);
-        output->header.frame_id = "rs200_camera_rviz";
-        output->header.stamp = ros::Time::now();
-
-          
-        pub.publish(output);
-
-        ///////////////////////////////////////////////////////////////////////////////////
+	        pcl::compute3DCentroid (*euclideanCloudFilteredPtr, centroid);
 
 
+	        centroid_pose.header.frame_id = "rs200_camera_rviz";
+	        centroid_pose.pose.position.x = centroid[0];
+	        centroid_pose.pose.position.y = centroid[1];
+	        centroid_pose.pose.position.z = centroid[2];
+	          
 
-        centroid_pose.pose.orientation.x = 0.0;
-        centroid_pose.pose.orientation.y = -0.7071;
-        centroid_pose.pose.orientation.z = 0.0;
-        centroid_pose.pose.orientation.w = 0.7071;
-        centroid_pub.publish(centroid_pose);
+	      
+	        // convert to rosmsg and publish:
+	        sensor_msgs::PointCloud2::Ptr output (new sensor_msgs::PointCloud2 ());
+	        pcl::toROSMsg(*euclideanCloudFilteredPtr, *output);
+	        output->header.frame_id = "rs200_camera_rviz";
+	        output->header.stamp = ros::Time::now();
 
-    }
+	          
+	        pub.publish(output);
 
-  else
+	        ///////////////////////////////////////////////////////////////////////////////////
+
+
+
+	        centroid_pose.pose.orientation.x = 0.0;
+	        centroid_pose.pose.orientation.y = -0.7071;
+	        centroid_pose.pose.orientation.z = 0.0;
+	        centroid_pose.pose.orientation.w = 0.7071;
+	        centroid_pub.publish(centroid_pose);
+
+	    }
+
+	  else
+	  	// Only ground plane in scene
+
+	  {
+
+	        geometry_msgs::PoseStamped centroid_pose;
+	        centroid_pose.header.frame_id = "rs200_camera_rviz";
+	        centroid_pose.pose.position.x = -10;
+	        centroid_pose.pose.position.y = -10;
+	        centroid_pose.pose.position.z = -10;
+	        centroid_pub.publish(centroid_pose);
+	  }
+
+  }
+
+ 
+else
+	// RS is pointing towards the sky / empty input
+  	
   {
 
         geometry_msgs::PoseStamped centroid_pose;
