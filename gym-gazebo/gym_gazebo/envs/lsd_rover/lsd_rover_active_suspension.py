@@ -170,20 +170,20 @@ class LsdEnv(gazebo_env.GazeboEnv):
             self.reward-=10
         if(abs(self.pitch>25)):
             self.done=True
-        if(5<(self.x_displacement)<5.5):
+        if(5<self.x_displacement<10):
+            self.reward+=30
+        if(10<self.x_displacement<19):
+            self.reward+=100
+        if(19<self.x_displacement<26):
+            self.reward+=200
+        if(26<self.x_displacement<38):
             self.reward+=500
-        if(11<(self.x_displacement)<11.5):
-            self.reward+=20
-        if(19<(self.x_displacement)<20):
-            self.reward+=20
-        if(26<(self.x_displacement)<27):
-            self.reward+=20
-        if(38<(self.x_displacement)<39):
-            self.reward+=20
-        if(abs(self.x_displacement)>40):
+        if(38<self.x_displacement<39):
+            self.reward+=1000
+        if(abs(self.x_displacement)>43):
             self.done=True      
-        if(abs(self.y_displacement)>4):
-            self.reward-=200
+        if(abs(self.y_displacement)>1.5):
+            self.reward-=10000
         if(abs(self.y_displacement)>5):
             self.done=True
         if(abs(self.actual_speed)<0.8):
