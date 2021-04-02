@@ -160,7 +160,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
 
         self.get_reward()
-        print(np.array(observation_,dtype=np.float32), self.reward, self.done)
+        #print(np.array(observation_,dtype=np.float32), self.reward, self.done)
         return np.array(observation_,dtype=np.float32), self.reward, self.done, {}
 
     def get_reward(self):
