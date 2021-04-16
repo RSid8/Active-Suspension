@@ -15,29 +15,45 @@ for lsd robot</p>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>pcl_conversions</build_depend>
-  <build_depend>pcl_ros</build_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>libpcl-dev</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_export_depend>pcl_conversions</build_export_depend>
-  <build_export_depend>pcl_ros</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
   <exec_depend>pcl_conversions</exec_depend>
-  <exec_depend>pcl_ros</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>depth_image_proc</exec_depend>
-  <exec_depend>libpcl</exec_depend>
 
   <depend>gazebo_ros</depend>
+  <depend>geometry_msgs</depend>
   <depend>camera_info_manager</depend>
   <depend>roslaunch</depend>
   <depend>robot_state_publisher</depend>
-  <depend>rviz</depend>
   <depend>joint_state_publisher</depend>
   <depend>gazebo</depend>
-  <depend>geometry_msgs</depend>
+  <depend>hector_gazebo_plugins</depend>
+
+  <depend>octomap_msgs</depend>
+  <depend>joy</depend>
+  <depend>effort_controllers</depend>
+  <depend>geodesy</depend>
+  <depend>octomap_ros</depend>
+  <depend>control_toolbox</depend>
+  <depend>pluginlib</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>control_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>nodelet</depend>
+  <depend>urdf</depend>
+  <depend>rviz</depend>
+  <depend>kdl_conversions</depend>
+  <depend>eigen_conversions</depend>
+  <depend>tf2_sensor_msgs</depend>
+  <depend>pcl_ros</depend>
+  <depend>navigation</depend>
+  <depend>sophus</depend>
+
 
   <export>
     <gazebo_ros
