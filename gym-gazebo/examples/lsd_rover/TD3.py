@@ -114,7 +114,11 @@ class ActorNetwork(nn.Module):
 
     def save_checkpoint(self):
         print('... saving checkpoint ...')
-        T.save(self.state_dict(), self.checkpoint_file)
+        if os.path.isdir(self.checkpoint_dir):
+            T.save(self.state_dict(), self.checkpoint_file)
+        else:
+            os.makedirs(self.checkpoint_dir, exist_ok=True)
+            T.save(self.state_dict(), self.checkpoint_file)
 
     def load_checkpoint(self):
         print('... loading checkpoint ...')
