@@ -67,7 +67,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -1
+        vel_cmd.linear.x = -0.49
 
         vel_cmd.linear.y = 0
 
