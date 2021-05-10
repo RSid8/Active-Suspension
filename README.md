@@ -14,7 +14,13 @@ Codebase of the Gazebo RL Closed- Chain Active Suspension System
 
 ### Installation
 
-    cd Active-Suspension/ && ./helper_script.sh
+* Install `python-rosdep` for resolving your workspaces' dependencies (**Don't install `rosdep2` as it will break your ros system**):
+
+      sudo apt-get install python3-rosdep && sudo rosdep init && rosdep update
+
+* Finally run the helper script:
+
+      cd Active-Suspension/ && ./helper_script.sh 
 
 ## Launch the simulation
 
