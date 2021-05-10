@@ -18,7 +18,9 @@ import time
 import tf2_ros
 import tf2_geometry_msgs
 from tf2_geometry_msgs import PoseStamped
+
 rospack = rospkg.RosPack()
+
 
 class LsdEnv(gazebo_env.GazeboEnv):
     def __init__(self):
@@ -27,13 +29,14 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.pitch = 0
         self.roll = 0
         self.yaw = 0
-        self.y_displacement=0
-        self.x_displacement=0
-        self.ground_clearance=0
+        self.centroid = 0
+        self.y_displacement = 0
+        self.x_displacement = 0
+        self.ground_clearance = 0
         self.reward = 0
-        self.observation_space = spaces.Box(low=-50,high=50, shape=(8,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-50, high=50, shape=(8,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(low=-1,high=1, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.obstacle_height = 0
         self.obstacle_offset = 0
@@ -47,7 +50,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
         rospy.Subscriber("/odom", Odometry, self.callback_pose)
 
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
-
 
         self.joint_1_publisher = rospy.Publisher("/lsd/fl_joint_position_controller/command",
                                                  Float64, queue_size=10)
@@ -71,14 +73,14 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         vel_cmd.linear.y = 0
 
-        vel_cmd.angular.z =0
+        vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
 
     def teleport(self):
 
         state_msg = ModelState()
-        
+
         state_msg.model_name = 'lsd'
         state_msg.pose.position.x = 0
         state_msg.pose.position.y = 0
@@ -86,7 +88,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         state_msg.pose.orientation.x = 0
         state_msg.pose.orientation.y = 0
         state_msg.pose.orientation.z = 0
-        state_msg.pose.orientation.w = 0
+        state_msg.pose.orientation.w = 1
 
         rospy.wait_for_service('/gazebo/set_model_state')
         try:
@@ -95,7 +97,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         except rospy.ServiceException as e:
             print("Service call failed: %s" % e)
-
 
     def callback_imu(self, msg):
 
@@ -109,11 +110,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def callback_point(self, msg):
         self.centroid = msg
 
-
     def callback_pose(self, msg):
-        self.actual_speed=msg.twist.twist.linear.x
-        self.y_displacement=msg.pose.pose.position.y
-        self.x_displacement=msg.pose.pose.position.x
+        self.actual_speed = msg.twist.twist.linear.x
+        self.y_displacement = msg.pose.pose.position.y
+        self.x_displacement = msg.pose.pose.position.x
 
     """def transform_centroid(self):
         self.tfBuffer = tf2_ros.Buffer()
@@ -133,67 +133,63 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def get_observation(self):
         pose_transformed = self.centroid
         self.obstacle_distance = pose_transformed.pose.position.x
-        self.obstacle_height = 2*pose_transformed.pose.position.y
+        self.obstacle_height = 2 * pose_transformed.pose.position.y
         self.obstacle_offset = pose_transformed.pose.position.z
-        observation = [self.pitch, self.roll, self.actual_speed, self.y_displacement, 
-            self.obstacle_distance, self.obstacle_height, self.obstacle_offset, self.x_displacement]
+        observation = [self.pitch, self.roll, self.actual_speed, self.y_displacement,
+                       self.obstacle_distance, self.obstacle_height, self.obstacle_offset, self.x_displacement]
         return observation
 
     def step(self, action):
-
 
         rospy.wait_for_service('/gazebo/unpause_physics')
         try:
             self.unpause()
         except (rospy.ServiceException) as e:
-            print ("/gazebo/unpause_physics service call failed")
-        
+            print("/gazebo/unpause_physics service call failed")
+
         self.forward()
-        self.joint_1_publisher.publish(radians(30*action[0]))
-        self.joint_2_publisher.publish(radians(30*action[1]))
-        self.joint_3_publisher.publish(radians(30*action[2]))
-        self.joint_4_publisher.publish(radians(30*action[3]))
-        #print(self.x_displacement)
+        self.joint_1_publisher.publish(radians(30 * action[0]))
+        self.joint_2_publisher.publish(radians(30 * action[1]))
+        self.joint_3_publisher.publish(radians(30 * action[2]))
+        self.joint_4_publisher.publish(radians(30 * action[3]))
+        # print(self.x_displacement)
         time.sleep(0.1)
-        # publish till the action taken is completed      
+        # publish till the action taken is completed
         observation_ = self.get_observation()
 
-
         self.get_reward()
-        #print(np.array(observation_,dtype=np.float32), self.reward, self.done)
-        return np.array(observation_,dtype=np.float32), self.reward, self.done, {}
+        # print(np.array(observation_,dtype=np.float32), self.reward, self.done)
+        return np.array(observation_, dtype=np.float32), self.reward, self.done, {}
 
     def get_reward(self):
 
-        self.reward=0 
-        if(abs(self.pitch>17)):
-            self.reward-=10
-        if(abs(self.pitch>25)):
-            self.done=True
-        if(5<self.x_displacement<10):
-            self.reward+=30
-        if(10<self.x_displacement<19):
-            self.reward+=100
-        if(19<self.x_displacement<26):
-            self.reward+=200
-        if(26<self.x_displacement<38):
-            self.reward+=500
-        if(38<self.x_displacement<39):
-            self.reward+=1000
-        if(abs(self.x_displacement)>43):
-            self.done=True      
-        if(abs(self.y_displacement)>1.5):
-            self.reward-=10000
-        if(abs(self.y_displacement)>5):
-            self.done=True
-        if(abs(self.actual_speed)<0.8):
-            self.reward-=20  
+        self.reward = 0
+        if abs(self.pitch > 17):
+            self.reward -= 10
+        if abs(self.pitch > 25):
+            self.done = True
+        if 5 < self.x_displacement < 10:
+            self.reward += 30
+        if 10 < self.x_displacement < 19:
+            self.reward += 100
+        if 19 < self.x_displacement < 26:
+            self.reward += 200
+        if 26 < self.x_displacement < 38:
+            self.reward += 500
+        if 38 < self.x_displacement < 39:
+            self.reward += 1000
+        if abs(self.x_displacement) > 43:
+            self.done = True
+        if abs(self.y_displacement) > 1.5:
+            self.reward -= 10000
+        if abs(self.y_displacement) > 5:
+            self.done = True
+        if abs(self.actual_speed) < 0.8:
+            self.reward -= 20
 
-    
-    
     def reset(self):
 
-        self.done=False
+        self.done = False
         self.teleport()
         vel_cmd = Twist()
         vel_cmd.linear.x = 0

@@ -18,7 +18,10 @@ import time
 import tf2_ros
 import tf2_geometry_msgs
 from tf2_geometry_msgs import PoseStamped
+from random import randint
+
 rospack = rospkg.RosPack()
+
 
 class LsdEnv(gazebo_env.GazeboEnv):
     def __init__(self):
@@ -27,13 +30,14 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.pitch = 0
         self.roll = 0
         self.yaw = 0
-        self.y_displacement=0
-        self.x_displacement=0
-        self.ground_clearance=0
+        self.centroid = 0
+        self.y_displacement = 0
+        self.x_displacement = 0
+        self.ground_clearance = 0
         self.reward = 0
-        self.observation_space = spaces.Box(low=-50,high=50, shape=(3,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-50, high=50, shape=(3,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(low=0,high=5, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(low=0, high=5, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.obstacle_height = 0
         self.obstacle_offset = 0
@@ -47,7 +51,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
         rospy.Subscriber("/odom", Odometry, self.callback_pose)
 
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
-
 
         self.joint_1_publisher = rospy.Publisher("/lsd/fl_joint_position_controller/command",
                                                  Float64, queue_size=10)
@@ -71,14 +74,13 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         vel_cmd.linear.y = 0
 
-        vel_cmd.angular.z =0
+        vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
 
     def teleport(self):
 
         state_msg = ModelState()
-        
         state_msg.model_name = 'lsd'
         state_msg.pose.position.x = 0
         state_msg.pose.position.y = 0
@@ -86,16 +88,29 @@ class LsdEnv(gazebo_env.GazeboEnv):
         state_msg.pose.orientation.x = 0
         state_msg.pose.orientation.y = 0
         state_msg.pose.orientation.z = 0
-        state_msg.pose.orientation.w = 0
+        state_msg.pose.orientation.w = 1
+
+        step = ModelState()
+        obstacle_height = randint(25, 32)
+        print("\nOBSTACLE HEIGHT = %scm" % obstacle_height)
+
+        step.model_name = 'step1'
+        step.pose.position.x = 5
+        step.pose.position.y = 0
+        step.pose.position.z = (float(obstacle_height) / 100.) - 0.16
+        step.pose.orientation.x = 0
+        step.pose.orientation.y = 0
+        step.pose.orientation.z = 0
+        step.pose.orientation.w = 1
 
         rospy.wait_for_service('/gazebo/set_model_state')
         try:
             set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
             set_state(state_msg)
+            set_state(step)
 
         except rospy.ServiceException as e:
             print("Service call failed: %s" % e)
-
 
     def callback_imu(self, msg):
 
@@ -109,11 +124,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def callback_point(self, msg):
         self.centroid = msg
 
-
     def callback_pose(self, msg):
-        self.actual_speed=msg.twist.twist.linear.x
-        self.y_displacement=msg.pose.pose.position.y
-        self.x_displacement=msg.pose.pose.position.x
+        self.actual_speed = msg.twist.twist.linear.x
+        self.y_displacement = msg.pose.pose.position.y
+        self.x_displacement = msg.pose.pose.position.x
 
     """def transform_centroid(self):
         self.tfBuffer = tf2_ros.Buffer()
@@ -130,19 +144,19 @@ class LsdEnv(gazebo_env.GazeboEnv):
             pose_transformed = tf2_geometry_msgs.do_transform_pose(self.centroid, trans)
             return pose_transformed"""
 
-    def descretize_func(self, tu):       
+    def descretize_func(self, tu):
         for i in range(len(tu)):
-            tu[i]=round(tu[i],1)
+            tu[i] = round(tu[i], 1)
 
         return tu
-            
+
     def get_observation(self):
-        #pose_transformed = self.centroid
-        #self.obstacle_distance = pose_transformed.pose.position.x
-        #self.obstacle_height = 2*pose_transformed.pose.position.y
-        #self.obstacle_offset = pose_transformed.pose.position.z
+        # pose_transformed = self.centroid
+        # self.obstacle_distance = pose_transformed.pose.position.x
+        # self.obstacle_height = 2*pose_transformed.pose.position.y
+        # self.obstacle_offset = pose_transformed.pose.position.z
         observation = [self.pitch, self.roll, self.x_displacement]
-          
+
         return observation
 
     def step(self, action):
@@ -150,14 +164,14 @@ class LsdEnv(gazebo_env.GazeboEnv):
         rospy.wait_for_service('/gazebo/unpause_physics')
         try:
             self.unpause()
-        except (rospy.ServiceException) as e:
-            print ("/gazebo/unpause_physics service call failed")
-        
+        except rospy.ServiceException:
+            print("/gazebo/unpause_physics service call failed")
+
         self.forward()
 
-        if(2.9<self.x_displacement<3):
-            action[2]+=30
-            action[3]+=30
+        if 2.9 < self.x_displacement < 3:
+            action[2] += 30
+            action[3] += 30
 
             self.joint_1_publisher.publish(radians(action[0]))
             self.joint_2_publisher.publish(radians(action[1]))
@@ -168,8 +182,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
             time.sleep(4)
 
-            action[2]=-action[2]
-            action[3]=-action[3]
+            action[2] = -action[2]
+            action[3] = -action[3]
 
             self.joint_1_publisher.publish(radians(action[0]))
             self.joint_2_publisher.publish(radians(action[1]))
@@ -193,34 +207,29 @@ class LsdEnv(gazebo_env.GazeboEnv):
             self.joint_4_publisher.publish(radians(0))
 
             time.sleep(1)
-        
-            
+
         observation_ = self.get_observation()
 
         self.get_reward()
-        #print(np.array(observation_,dtype=np.float32), self.reward, self.done)
-        return np.array(observation_,dtype=np.float32), self.reward, self.done, {}
+        # print(np.array(observation_,dtype=np.float32), self.reward, self.done)
+        return np.array(observation_, dtype=np.float32), self.reward, self.done, {}
 
     def get_reward(self):
-        self.reward=0
-        if(abs(self.pitch>20)):
-            self.done=True
-            self.reward=1000
+        self.reward = 0
+        if abs(self.pitch > 20):
+            self.done = True
+            self.reward = 1000
 
         else:
-        	self.reward=1
+            self.reward = 1
 
-
-    
-    
     def reset(self):
 
-        self.done=False
+        self.done = False
         self.teleport()
         vel_cmd = Twist()
         vel_cmd.linear.x = 0
         vel_cmd.angular.z = 0
-
 
         self.velocity_publisher.publish(vel_cmd)
 
@@ -239,11 +248,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         except rospy.ServiceException:
             print("/gazebo/unpause_physics service call failed")
 
-
         initial_reading = self.get_observation()
-
-
-
 
         rospy.wait_for_service('/gazebo/pause_physics')
         try:

@@ -74,7 +74,7 @@ env = Monitor(env, log_dir)
 #training code
 model=PPO("MlpPolicy", env,tensorboard_log=log_dir,verbose=1)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
-timesteps = 50000
+timesteps = 1000
 model.learn(total_timesteps=int(timesteps), callback=callback)
 
 plot_results([log_dir], timesteps, results_plotter.X_TIMESTEPS, "PPO ActiveSuspension")

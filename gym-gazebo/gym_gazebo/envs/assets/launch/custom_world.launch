@@ -3,7 +3,7 @@
   
 
   <arg name="world_name" default="obstacles.world"/>
-  <arg name="record" default="true"/>
+  <arg name="record" default="false"/>
   <arg name="rec_name" default="imu.bag"/>
   
   
@@ -54,7 +54,7 @@
 
   <group if="$(arg record)">
     <node name="rosbag_record_pick" pkg="rosbag" type="record"
-           args="record -O $(find lsd)/bag_files/$(arg rec_name) --chunksize=10 /imu" output="screen"/>
+           args="record -O $(find lsd)/bag_files/$(arg rec_name) --chunksize=10 /imu /pose" output="screen"/>
   </group>
 
 
