@@ -28,6 +28,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         gazebo_env.GazeboEnv.__init__(self, "custom_world.launch")
 
         self.pitch = 0
+        self.counter=0
         self.roll = 0
         self.yaw = 0
         self.centroid = 0
@@ -35,11 +36,12 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.x_displacement = 0
         self.ground_clearance = 0
         self.reward = 0
-        self.observation_space = spaces.Box(low=-50, high=50, shape=(3,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-50, high=50, shape=(4,), dtype=np.float64)
         self.orientation_list = []
-        self.action_space = spaces.Box(low=0, high=5, shape=(4,), dtype=np.float32)
+        self.action_space = spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float64)
         self.obstacle_distance = 0
         self.obstacle_height = 0
+        self.step_height=0
         self.obstacle_offset = 0
         self.chassis_angle = 0
         self.actual_speed = 0
@@ -70,7 +72,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
     def forward(self):
 
         vel_cmd = Twist()
-        vel_cmd.linear.x = -0.49
+        vel_cmd.linear.x = -0.7
 
         vel_cmd.linear.y = 0
 
@@ -91,13 +93,13 @@ class LsdEnv(gazebo_env.GazeboEnv):
         state_msg.pose.orientation.w = 1
 
         step = ModelState()
-        obstacle_height = randint(25, 32)
-        print("\nOBSTACLE HEIGHT = %scm" % obstacle_height)
+        self.step_height = randint(25, 32)
+        print("\nOBSTACLE HEIGHT = %scm" % self.step_height)
 
         step.model_name = 'step1'
         step.pose.position.x = 5
         step.pose.position.y = 0
-        step.pose.position.z = (float(obstacle_height) / 100.) - 0.16
+        step.pose.position.z = (float(self.step_height) / 100.) - 0.16
         step.pose.orientation.x = 0
         step.pose.orientation.y = 0
         step.pose.orientation.z = 0
@@ -120,6 +122,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.pitch = degrees(self.pitch)
         self.roll = degrees(self.roll)
         self.yaw = degrees(self.yaw)
+        self.counter+=1
+
 
     def callback_point(self, msg):
         self.centroid = msg
@@ -155,7 +159,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         # self.obstacle_distance = pose_transformed.pose.position.x
         # self.obstacle_height = 2*pose_transformed.pose.position.y
         # self.obstacle_offset = pose_transformed.pose.position.z
-        observation = [self.pitch, self.roll, self.x_displacement]
+        observation = [self.pitch, self.roll, self.x_displacement, self.step_height]
 
         return observation
 
@@ -170,29 +174,32 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.forward()
 
         if 2.9 < self.x_displacement < 3:
-            action[2] += 30
-            action[3] += 30
 
-            self.joint_1_publisher.publish(radians(action[0]))
-            self.joint_2_publisher.publish(radians(action[1]))
-            self.joint_3_publisher.publish(radians(action[2]))
-            self.joint_4_publisher.publish(radians(action[3]))
 
-            time.sleep(0.5)
 
-            time.sleep(4)
+            action[2]=action[2]*37
+            action[3]=action[2]
 
-            action[2] = -action[2]
-            action[3] = -action[3]
-
-            self.joint_1_publisher.publish(radians(action[0]))
-            self.joint_2_publisher.publish(radians(action[1]))
-            self.joint_3_publisher.publish(radians(action[2]))
-            self.joint_4_publisher.publish(radians(action[3]))
+            self.joint_1_publisher.publish(radians(0))
+            self.joint_2_publisher.publish(radians(0))
+            self.joint_3_publisher.publish(radians(abs(action[2])))
+            self.joint_4_publisher.publish(radians(abs(action[3])))
 
             time.sleep(0.5)
 
             time.sleep(5)
+
+            action[2] = -abs(action[2])
+            action[3] = -abs(action[3])
+
+            self.joint_1_publisher.publish(radians(0))
+            self.joint_2_publisher.publish(radians(0))
+            self.joint_3_publisher.publish(radians(action[2]))
+            self.joint_4_publisher.publish(radians(action[3]))
+
+            time.sleep(0.5)
+
+            time.sleep(3)
 
             self.joint_1_publisher.publish(radians(10))
             self.joint_2_publisher.publish(radians(10))
@@ -208,6 +215,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
             time.sleep(1)
 
+
         observation_ = self.get_observation()
 
         self.get_reward()
@@ -215,17 +223,25 @@ class LsdEnv(gazebo_env.GazeboEnv):
         return np.array(observation_, dtype=np.float32), self.reward, self.done, {}
 
     def get_reward(self):
-        self.reward = 0
         if abs(self.pitch > 20):
             self.done = True
-            self.reward = 1000
+            self.reward = -100
+        if abs(self.x_displacement>3.1):
+            self.reward= 100
+            self.done=True
+        if(self.counter>430 and self.x_displacement<3.3):
+            self.reward=-50
+            self.done=True
+        if(self.counter>430):
+            self.done=True
 
-        else:
-            self.reward = 1
+
 
     def reset(self):
 
         self.done = False
+        self.reward=0
+        self.counter=0
         self.teleport()
         vel_cmd = Twist()
         vel_cmd.linear.x = 0

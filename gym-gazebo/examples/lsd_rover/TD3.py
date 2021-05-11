@@ -126,7 +126,7 @@ class ActorNetwork(nn.Module):
 
 #####################################################################################################################################################################################################################
 class Agent():
-    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=950000, n_actions=4, max_size=10000000, layer1_size=400, layer2_size=300, batch_size=100, noise=30):
+    def __init__(self, alpha, beta, input_dims, tau, env,gamma=0.99, update_actor_interval=2, warmup=30000, n_actions=4, max_size=50000, layer1_size=400, layer2_size=300, batch_size=100, noise=30):
         self.gamma = gamma
         self.tau = tau
         self.max_action = env.action_space.high
@@ -154,13 +154,13 @@ class Agent():
     def choose_action(self, observation):
         if self.time_step < self.warmup:
             mu = T.tensor(np.random.normal(loc=0.0,scale=self.noise, size=(self.n_actions,)))
+
         else:
             state = T.tensor(observation, dtype=T.float).to(self.actor.device)
             mu = self.actor.forward(state).to(self.actor.device)
         mu_prime = mu + T.tensor(np.random.normal(scale=self.noise), dtype=T.float).to(self.actor.device)
         
         mu_prime = T.clamp(mu_prime, self.min_action[0], self.max_action[0])
-        
         self.time_step += 1
 
         return mu_prime.cpu().detach().numpy()
@@ -289,7 +289,7 @@ if __name__ == '__main__':
             input_dims=env.observation_space.shape, tau=0.005,   ##observation_space.shape= numpy array for size 7 or 9
             env=env, batch_size=100, layer1_size=400, layer2_size=300,
             n_actions=4)
-    n_games = 8000
+    n_games = 400
     filename = 'plots/' + 'LsdActiveSuspension_' + str(n_games) + '_games.png'
 
     best_score = env.reward_range[0]
@@ -300,20 +300,16 @@ if __name__ == '__main__':
     for i in range(n_games):
         t=agent.time_step
         observation = env.reset()
-        p=0
         done = False
         score = 0
         while not done:
         
             action = agent.choose_action(observation)
-            p=p+1
+
+           
             
             observation_, reward, done, info = env.step(action)
-
-            if(p==220):
-                done=True
-            else:
-                pass        
+       
             agent.remember(observation, action, reward, observation_, done)
             agent.learn()
             score += reward
