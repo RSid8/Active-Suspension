@@ -176,7 +176,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
         if 2.9 < self.x_displacement < 3:
 
 
-
             action[2]=action[2]*37
             action[3]=action[2]
 
