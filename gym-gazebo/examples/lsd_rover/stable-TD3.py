@@ -70,6 +70,7 @@ env = gym.make('GazeboMarsLsdForce-Lidar-v0')
 check_env(env)
 #env=make_vec_env('GazeboMarsLsdForce-Lidar-v0', n_envs=1)
 env = Monitor(env, log_dir)
+timesteps=1e6
 
 
 # The noise objects for TD3
@@ -78,7 +79,7 @@ action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.1 * np.ones(n
 
 model = TD3(MlpPolicy, env, action_noise=action_noise, verbose=1)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
-model.learn(total_timesteps=1000000, log_interval=10)
+model.learn(total_timesteps=timesteps, log_interval=10)
 
 
 
