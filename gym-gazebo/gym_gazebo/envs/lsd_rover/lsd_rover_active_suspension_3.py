@@ -19,7 +19,7 @@ import tf2_ros
 import tf2_geometry_msgs
 from tf2_geometry_msgs import PoseStamped
 from random import randint
-
+import torch
 rospack = rospkg.RosPack()
 
 
@@ -36,9 +36,9 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.x_displacement = 0
         self.ground_clearance = 0
         self.reward = 0
-        self.observation_space = spaces.Box(low=-50, high=50, shape=(4,), dtype=np.float64)
+        self.observation_space = spaces.Box(low=-50, high=50, shape=(4,), dtype=np.float32)
         self.orientation_list = []
-        self.action_space = spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float64)
+        self.action_space = spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32)
         self.obstacle_distance = 0
         self.obstacle_height = 0
         self.step_height=0
@@ -219,7 +219,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         self.get_reward()
         # print(np.array(observation_,dtype=np.float32), self.reward, self.done)
-        return np.array(observation_, dtype=np.float32), self.reward, self.done, {}
+        return np.array(observation_), self.reward, self.done, {}
 
     def get_reward(self):
         if abs(self.pitch > 20):
