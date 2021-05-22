@@ -1,4 +1,3 @@
-#{"t_start": 1621157444.5997586, "env_id": "GazeboMarsLsdForce-Lidar-v0"}
+#{"t_start": 1621685998.6745057, "env_id": "GazeboMarsLsdForce-Lidar-v0"}
 r,l,t
-100,798,33.879915
-100,936,163.477054
+-50,900,29.580401

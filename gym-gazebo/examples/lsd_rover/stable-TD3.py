@@ -79,7 +79,7 @@ action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.1 * np.ones(n
 
 model = TD3(MlpPolicy, env, action_noise=action_noise, verbose=1)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
-model.learn(total_timesteps=timesteps, log_interval=10)
+model.learn(total_timesteps=int(timesteps), callback=callback)
 
 
 
