@@ -1,4 +1,3 @@
-import gym
 import numpy as np
 import torch
 import torch.nn as nn
@@ -7,10 +6,8 @@ import gym_gazebo
 import time
 import os
 import matplotlib.pyplot as plt
-from stable_baselines3 import TD3
-from stable_baselines3.td3.policies import MlpPolicy
-from stable_baselines3.common.vec_env import DummyVecEnv
-from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
+from stable_baselines3 import SAC
+from stable_baselines3.sac.policies import MlpPolicy
 from stable_baselines3.common.cmd_util import make_vec_env
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common import results_plotter
@@ -19,7 +16,6 @@ from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.env_checker import check_env
 
-#Class for saving checkpoints based on training parameters
 class SaveOnBestTrainingRewardCallback(BaseCallback):
     """
     Callback for saving a model (the check is done every ``check_freq`` steps)
@@ -64,24 +60,20 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
 
         return True
 
-log_dir = "tmp2/"
+log_dir = "tmp3/"
 os.makedirs(log_dir, exist_ok=True)
 env = gym.make('GazeboMarsLsdForce-Lidar-v0')
 check_env(env)
-#env=make_vec_env('GazeboMarsLsdForce-Lidar-v0', n_envs=1)
 env = Monitor(env, log_dir)
-timesteps=700000
+timesteps=1000000
 
 
-# The noise objects for TD3
-n_actions = env.action_space.shape[-1]
-action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions))
-
-model = TD3(MlpPolicy, env, action_noise=action_noise, verbose=1)
+model = SAC(MlpPolicy, env, verbose=1)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
 model.learn(total_timesteps=int(timesteps), callback=callback)
 
 
 
-plot_results([log_dir], timesteps, results_plotter.X_TIMESTEPS, "TD3 ActiveSuspension")
+plot_results([log_dir], timesteps, results_plotter.X_TIMESTEPS, "A2C ActiveSuspension")
 plt.show()
+    
