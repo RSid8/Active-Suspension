@@ -65,9 +65,9 @@ os.makedirs(log_dir, exist_ok=True)
 env = gym.make('GazeboMarsLsdForce-Lidar-v0')
 check_env(env)
 env = Monitor(env, log_dir)
-timesteps=1000
+timesteps=100000
 
-model = SAC(MlpPolicy, env, verbose=1)
+model = SAC(MlpPolicy, env, tensorboard_log=log_dir, verbose=1)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
 model.learn(total_timesteps=int(timesteps), callback=callback)
 

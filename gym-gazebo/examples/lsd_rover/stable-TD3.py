@@ -64,20 +64,20 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
 
         return True
 
-log_dir = "tmp2/"
+log_dir = "tmp2"
 os.makedirs(log_dir, exist_ok=True)
 env = gym.make('GazeboMarsLsdForce-Lidar-v0')
 check_env(env)
 #env=make_vec_env('GazeboMarsLsdForce-Lidar-v0', n_envs=1)
 env = Monitor(env, log_dir)
-timesteps=700000
+timesteps=100000
 
 
 # The noise objects for TD3
 n_actions = env.action_space.shape[-1]
 action_noise = NormalActionNoise(mean=np.zeros(n_actions), sigma=0.1 * np.ones(n_actions))
 
-model = TD3(MlpPolicy, env, action_noise=action_noise, verbose=1)
+model = TD3(MlpPolicy, env, tensorboard_log=log_dir, action_noise=action_noise, verbose=1)
 callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
 model.learn(total_timesteps=int(timesteps), callback=callback)
 
