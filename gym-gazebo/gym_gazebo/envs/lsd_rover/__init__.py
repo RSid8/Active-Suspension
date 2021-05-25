@@ -1,1 +1,1 @@
-from gym_gazebo.envs.lsd_rover.lsd_rover_active_suspension_3 import LsdEnv
+from gym_gazebo.envs.lsd_rover.lsd_rover_active_suspension import LsdEnv
