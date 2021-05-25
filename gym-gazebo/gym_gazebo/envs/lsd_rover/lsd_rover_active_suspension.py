@@ -227,7 +227,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
             self.reward = -100
         if abs(self.yaw)>10:
             self.reward=-100
-        if abs(self.x_displacement>3.6):
+        if abs(self.x_displacement)>3.6:
             self.reward= 100
             self.done=True
         if(self.counter>430 and self.x_displacement<3.3):
