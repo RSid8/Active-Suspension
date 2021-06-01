@@ -20,6 +20,7 @@ import tf2_geometry_msgs
 from tf2_geometry_msgs import PoseStamped
 from random import randint
 import torch
+from gazebo_msgs.msg import ModelStates
 rospack = rospkg.RosPack()
 
 
@@ -51,6 +52,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
         rospy.Subscriber("/imu", Imu, self.callback_imu)
 
         rospy.Subscriber("/odom", Odometry, self.callback_pose)
+
+        rospy.Subscriber("/gazebo/model_states", ModelStates, self.callback_chassis_rise)
 
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
 
@@ -97,7 +100,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         print("\nOBSTACLE HEIGHT = %scm" % self.step_height)
 
         step.model_name = 'step1'
-        step.pose.position.x = 5
+        step.pose.position.x = -5
         step.pose.position.y = 0
         step.pose.position.z = (float(self.step_height) / 100.) - 0.16
         step.pose.orientation.x = 0
@@ -124,6 +127,12 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.yaw = degrees(self.yaw)
         self.counter+=1
 
+    def callback_chassis_rise(self, msg):
+        try:
+            print("CHASSIS RISE = %sm" % msg.pose[msg.name.index('lsd')].position.z)
+    
+        except ValueError:
+            pass
 
     def callback_point(self, msg):
         self.centroid = msg
