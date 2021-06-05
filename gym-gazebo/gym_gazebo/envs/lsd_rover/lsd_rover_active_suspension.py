@@ -100,7 +100,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         print("\nOBSTACLE HEIGHT = %scm" % self.step_height)
 
         step.model_name = 'step1'
-        step.pose.position.x = -5
+        step.pose.position.x = 5
         step.pose.position.y = 0
         step.pose.position.z = (float(self.step_height) / 100.) - 0.16
         step.pose.orientation.x = 0
