@@ -47,7 +47,7 @@
         </camera>
         <always_on>1</always_on>
         <update_rate>60</update_rate>
-        <visualize>1</visualize>
+        <visualize>0</visualize>
         <pose>0.11 0 0.445 0 -0 0</pose>
       </sensor>
       <sensor name='ired1' type='camera'>
@@ -70,7 +70,7 @@
         </camera>
         <always_on>1</always_on>
         <update_rate>60</update_rate>
-        <visualize>1</visualize>
+        <visualize>0</visualize>
         <pose>0.11 0 0.445 0 -0 0</pose>
       </sensor>
       <sensor name='ired2' type='camera'>
@@ -93,7 +93,7 @@
         </camera>
         <always_on>1</always_on>
         <update_rate>60</update_rate>
-        <visualize>1</visualize>
+        <visualize>0</visualize>
         <pose>0.11 0 0.445 0 -0 0</pose>
       </sensor>
       <sensor name='depth' type='depth'>
@@ -115,7 +115,7 @@
         </camera>
         <always_on>1</always_on>
         <update_rate>60</update_rate>
-        <visualize>1</visualize>
+        <visualize>0</visualize>
         <pose>0.11 0 0.445 0 -0 0</pose>
       </sensor>
       <velocity_decay/>
