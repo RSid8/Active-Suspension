@@ -133,21 +133,6 @@ class LsdEnv(gazebo_env.GazeboEnv):
         self.y_displacement = msg.pose.pose.position.y
         self.x_displacement = msg.pose.pose.position.x
 
-    """def transform_centroid(self):
-        self.tfBuffer = tf2_ros.Buffer()
-        self.listener = tf2_ros.TransformListener(self.tfBuffer)
-        while not rospy.is_shutdown():
-            try:
-                trans = self.tfBuffer.lookup_transform("base_link", "r200_camera_rviz", 
-                    rospy.Time(0))
-            except(tf2_ros.LookupException, tf2_ros.ConnectivityException, 
-                    tf2_ros.ExtrapolationException) as e:
-                    self.rate.sleep()
-                    print(e)
-                    continue
-            pose_transformed = tf2_geometry_msgs.do_transform_pose(self.centroid, trans)
-            return pose_transformed"""
-
     def descretize_func(self, tu):
         for i in range(len(tu)):
             tu[i] = round(tu[i], 1)
@@ -155,12 +140,12 @@ class LsdEnv(gazebo_env.GazeboEnv):
         return tu
 
     def get_observation(self):
-        # pose_transformed = self.centroid
-        # self.obstacle_distance = pose_transformed.pose.position.x
-        # self.obstacle_height = 2*pose_transformed.pose.position.y
-        # self.obstacle_offset = pose_transformed.pose.position.z
+        #pose_transformed = self.centroid
+        #self.obstacle_distance = pose_transformed.pose.position.x
+        #self.obstacle_height = 2*pose_transformed.pose.position.y
+        #self.obstacle_offset = pose_transformed.pose.position.z
         observation = [self.pitch, self.roll, self.x_displacement, self.step_height]
-
+        #print(self.obstacle_distance, self.obstacle_height)
         return observation
 
     def step(self, action):
@@ -173,7 +158,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         self.forward()
 
-        if 2.9 < self.x_displacement < 3:
+        if 2.9< self.x_displacement <3.3:
 
 
             action[2]=action[2]*37
