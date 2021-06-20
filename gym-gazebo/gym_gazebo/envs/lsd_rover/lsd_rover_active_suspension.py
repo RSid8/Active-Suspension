@@ -29,6 +29,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
         gazebo_env.GazeboEnv.__init__(self, "custom_world.launch")
 
         self.pitch = 0
+        self.chassis_rise = 0.0
         self.counter=0
         self.roll = 0
         self.yaw = 0
@@ -57,13 +58,13 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, queue_size=10)
 
-        self.joint_1_publisher = rospy.Publisher("/lsd/fl_joint_position_controller/command",
+        self.fl_joint_pub = rospy.Publisher("/lsd/fl_joint_position_controller/command",
                                                  Float64, queue_size=10)
-        self.joint_2_publisher = rospy.Publisher("/lsd/fr_joint_position_controller/command",
+        self.fr_joint_pub = rospy.Publisher("/lsd/fr_joint_position_controller/command",
                                                  Float64, queue_size=10)
-        self.joint_3_publisher = rospy.Publisher("/lsd/bl_joint_position_controller/command",
+        self.bl_joint_pub = rospy.Publisher("/lsd/bl_joint_position_controller/command",
                                                  Float64, queue_size=10)
-        self.joint_4_publisher = rospy.Publisher("/lsd/br_joint_position_controller/command",
+        self.br_joint_pub = rospy.Publisher("/lsd/br_joint_position_controller/command",
                                                  Float64, queue_size=10)
 
         self.pause = rospy.ServiceProxy("/gazebo/pause_physics", Empty)
@@ -76,9 +77,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         vel_cmd = Twist()
         vel_cmd.linear.x = -0.7
-
         vel_cmd.linear.y = 0
-
         vel_cmd.angular.z = 0
 
         self.velocity_publisher.publish(vel_cmd)
@@ -97,7 +96,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         step = ModelState()
         self.step_height = randint(25, 32)
-        print("\nOBSTACLE HEIGHT = %scm" % self.step_height)
+        # print("\nOBSTACLE HEIGHT = %scm" % self.step_height)
 
         step.model_name = 'step1'
         step.pose.position.x = 5
@@ -129,7 +128,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
     def callback_chassis_rise(self, msg):
         try:
-            print("CHASSIS RISE = %sm" % msg.pose[msg.name.index('lsd')].position.z)
+            self.chassis_rise = msg.pose[msg.name.index('lsd')].position.z
+            # print(self.chassis_rise)
     
         except ValueError:
             pass
@@ -149,12 +149,8 @@ class LsdEnv(gazebo_env.GazeboEnv):
         return tu
 
     def get_observation(self):
-        #pose_transformed = self.centroid
-        #self.obstacle_distance = pose_transformed.pose.position.x
-        #self.obstacle_height = 2*pose_transformed.pose.position.y
-        #self.obstacle_offset = pose_transformed.pose.position.z
+
         observation = [self.pitch, self.roll, self.x_displacement, self.step_height]
-        #print(self.obstacle_distance, self.obstacle_height)
         return observation
 
     def step(self, action):
@@ -173,10 +169,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
             action[2]=action[2]*37
             action[3]=action[3]*37
 
-            self.joint_1_publisher.publish(radians(0))
-            self.joint_2_publisher.publish(radians(0))
-            self.joint_3_publisher.publish(radians(abs(action[2])))
-            self.joint_4_publisher.publish(radians(abs(action[3])))
+            self.fl_joint_pub.publish(radians(0))
+            self.fr_joint_pub.publish(radians(0))
+            self.bl_joint_pub.publish(radians(abs(action[2])))
+            self.br_joint_pub.publish(radians(abs(action[3])))
 
             time.sleep(0.5)
 
@@ -185,26 +181,26 @@ class LsdEnv(gazebo_env.GazeboEnv):
             action[0] = -abs(action[0]*37)
             action[1] = -abs(action[1]*37)
 
-            self.joint_1_publisher.publish(radians(0))
-            self.joint_2_publisher.publish(radians(0))
-            self.joint_3_publisher.publish(radians(action[0]))
-            self.joint_4_publisher.publish(radians(action[1]))
+            self.fl_joint_pub.publish(radians(0))
+            self.fr_joint_pub.publish(radians(0))
+            self.bl_joint_pub.publish(radians(action[0]))
+            self.br_joint_pub.publish(radians(action[1]))
 
             time.sleep(0.5)
 
             time.sleep(3)
 
-            self.joint_1_publisher.publish(radians(10))
-            self.joint_2_publisher.publish(radians(10))
-            self.joint_3_publisher.publish(radians(0))
-            self.joint_4_publisher.publish(radians(0))
+            self.fl_joint_pub.publish(radians(10))
+            self.fr_joint_pub.publish(radians(10))
+            self.bl_joint_pub.publish(radians(0))
+            self.br_joint_pub.publish(radians(0))
 
             time.sleep(2)
 
-            self.joint_1_publisher.publish(radians(0))
-            self.joint_2_publisher.publish(radians(0))
-            self.joint_3_publisher.publish(radians(0))
-            self.joint_4_publisher.publish(radians(0))
+            self.fl_joint_pub.publish(radians(0))
+            self.fr_joint_pub.publish(radians(0))
+            self.bl_joint_pub.publish(radians(0))
+            self.br_joint_pub.publish(radians(0))
 
             time.sleep(1)
 
@@ -244,10 +240,10 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         self.velocity_publisher.publish(vel_cmd)
 
-        self.joint_1_publisher.publish(0)
-        self.joint_2_publisher.publish(0)
-        self.joint_3_publisher.publish(0)
-        self.joint_4_publisher.publish(0)
+        self.fl_joint_pub.publish(0)
+        self.fr_joint_pub.publish(0)
+        self.bl_joint_pub.publish(0)
+        self.br_joint_pub.publish(0)
 
         time.sleep(2)
 

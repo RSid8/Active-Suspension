@@ -21,194 +21,6 @@
       <kinematic>0</kinematic>
       <pose>0 0 0 0 -0 0</pose>
 
-<!-- ..................................SENSOR PLUGIN.....................................-->
-
-
-<!--.................................REALSENSE PLUGIN....................................-->
-
-
-      <sensor name='color' type='camera'>
-        <camera name='rs200_camera'>
-          <horizontal_fov>1.047</horizontal_fov>
-          <image>
-            <width>640</width>
-            <height>480</height>
-            <format>RGB_INT8</format>
-          </image>
-          <clip>
-            <near>0.1</near>
-            <far>100</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <mean>0</mean>
-            <stddev>0.007</stddev>
-          </noise>
-        </camera>
-        <always_on>1</always_on>
-        <update_rate>60</update_rate>
-        <visualize>0</visualize>
-        <pose>0.11 0 0.445 0 -0 0</pose>
-      </sensor>
-      <sensor name='ired1' type='camera'>
-        <camera name='rs200_camera'>
-          <horizontal_fov>1.047</horizontal_fov>
-          <image>
-            <width>640</width>
-            <height>480</height>
-            <format>L_INT8</format>
-          </image>
-          <clip>
-            <near>0.1</near>
-            <far>100</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <mean>0</mean>
-            <stddev>0.05</stddev>
-          </noise>
-        </camera>
-        <always_on>1</always_on>
-        <update_rate>60</update_rate>
-        <visualize>0</visualize>
-        <pose>0.11 0 0.445 0 -0 0</pose>
-      </sensor>
-      <sensor name='ired2' type='camera'>
-        <camera name='rs200_camera'>
-          <horizontal_fov>1.047</horizontal_fov>
-          <image>
-            <width>640</width>
-            <height>480</height>
-            <format>L_INT8</format>
-          </image>
-          <clip>
-            <near>0.1</near>
-            <far>100</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <mean>0</mean>
-            <stddev>0.05</stddev>
-          </noise>
-        </camera>
-        <always_on>1</always_on>
-        <update_rate>60</update_rate>
-        <visualize>0</visualize>
-        <pose>0.11 0 0.445 0 -0 0</pose>
-      </sensor>
-      <sensor name='depth' type='depth'>
-        <camera name='rs200_camera'>
-          <horizontal_fov>1.047</horizontal_fov>
-          <image>
-            <width>640</width>
-            <height>480</height>
-          </image>
-          <clip>
-            <near>0.1</near>
-            <far>100</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <mean>0</mean>
-            <stddev>0.1</stddev>
-          </noise>
-        </camera>
-        <always_on>1</always_on>
-        <update_rate>60</update_rate>
-        <visualize>0</visualize>
-        <pose>0.11 0 0.445 0 -0 0</pose>
-      </sensor>
-      <velocity_decay/>
-      <gravity>1</gravity>
-      <velocity_decay/>
-
-<!--........................LIDAR SENSOR PLUGIN........................................-->
-     
-
-      <sensor name='lidar' type='ray'>
-        <visualize>false</visualize>
-        <update_rate>50</update_rate>
-        <ray>
-          <scan>
-            <horizontal>
-              <samples>151</samples>
-              <resolution>1</resolution>
-              <min_angle>-3.14159</min_angle>
-              <max_angle>3.14159</max_angle>
-            </horizontal>
-            <vertical>
-              <samples>1</samples>
-              <resolution>1</resolution>
-              <max_angle>0.14835</max_angle>
-              <min_angle>0</min_angle>
-            </vertical>
-          </scan>
-          <range>
-            <min>0.1</min>
-            <max>16</max>
-            <resolution>0.01</resolution>
-          </range>
-        </ray>
-        <plugin name='gazebo_lidar' filename='libgazebo_ros_laser.so'>
-          <gaussianNoise>0.005</gaussianNoise>
-          <alwaysOn>1</alwaysOn>
-          <update_rate>50</update_rate>
-          <updateRateHZ>10.0</updateRateHZ>
-          <topicName>scan</topicName>
-          <frameName>lidar_box</frameName>
-          <frameId>lidar_link</frameId>
-          <robotNamespace>/</robotNamespace>
-        </plugin>
-        <pose>0.25 0 0.12 0 -0 0</pose>
-      </sensor>
-
-
-<!--...................................ULTRASONIC PLUGIN...............................-->
-
-
-    <sensor name='TeraRanger' type='ray'>
-      <visualize>0</visualize>
-      <update_rate>50</update_rate>
-      <ray>
-        <scan>
-          <horizontal>
-            <samples>10</samples>
-            <resolution>1</resolution>
-            <min_angle>-0.2618</min_angle>
-            <max_angle>0.2618</max_angle>
-          </horizontal>
-          <vertical>
-            <samples>10</samples>
-            <resolution>1</resolution>
-            <min_angle>-0.2618</min_angle>
-            <max_angle>0.2618</max_angle>
-          </vertical>
-        </scan>
-        <range>
-          <min>0.02</min>
-          <max>4</max>
-          <resolution>0.02</resolution>
-        </range>
-      </ray>
-      <plugin name='gazebo_ros_range' filename='libgazebo_ros_range.so'>
-        <gaussianNoise>0.005</gaussianNoise>
-        <alwaysOn>1</alwaysOn>
-        <updateRate>50</updateRate>
-        <topicName>sonar</topicName>
-        <frameName>ultrasonic</frameName>
-        <radiation>ultrasound</radiation>
-        <fov>0.2967</fov>
-        <robotNamespace>/</robotNamespace>
-      </plugin>
-      <pose>0 0 -0.1 3.14159 1.57079 3.14159</pose>
-    </sensor>
-    <self_collide>0</self_collide>
-    <enable_wind>0</enable_wind>
-    <kinematic>0</kinematic>
-    <pose>0 0 0 0 -0 0</pose>
-
-<!--...................................................................................-->     
-
 
       <visual name='CH_visual'>
         <pose>0 0 0 0 -0 0</pose>
@@ -228,73 +40,7 @@
         <transparency>0</transparency>
         <cast_shadows>1</cast_shadows>
       </visual>
-      <visual name='CH_fixed_joint_lump__holder_visual_1'>
-        <pose>0.11 0 0.26 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.015 0.015 0.35</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/Orange</name>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-          </script>
-          <shader type='pixel'/>
-        </material>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-      <visual name='CH_fixed_joint_lump__ultrasonic_visual_4'>
-        <pose>0 0 -0.095 3.14159 1.57079 3.14159</pose>
-        <geometry>
-          <box>
-            <size>0.02 0.02 0.02</size>
-          </box>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/Green</name>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-          </script>
-          <shader type='pixel'/>
-        </material>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
 
-      <visual name='CH_fixed_joint_lump__lidar_box_visual_3'>
-        <pose>0.25 0 0.12 0 -0 0</pose>
-        <geometry>
-          <cylinder>
-            <length>0.075</length>
-            <radius>0.075</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <script>
-            <name>Gazebo/Grey</name>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-          </script>
-          <shader type='pixel'/>
-        </material>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
-      <visual name='CH_fixed_joint_lump__rs200_camera_visual_2'>
-        <pose>0.11 0 0.445 0 -0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://realsense_camera/meshes/realsense.dae</uri>
-          </mesh>
-        </geometry>
-        <material>
-          <shader type='pixel'/>
-        </material>
-        <transparency>0</transparency>
-        <cast_shadows>1</cast_shadows>
-      </visual>
       <collision name='CH_collision'>
         <laser_retro>0</laser_retro>
         <max_contacts>10</max_contacts>
@@ -351,62 +97,8 @@
           </contact>
         </surface>
       </collision>
-      <collision name='CH_fixed_joint_lump__rs200_camera_collision_1'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0.11 0 0.445 0 -0 0</pose>
-        <geometry>
-          <box>
-            <size>0.0078 0.13 0.0192</size>
-          </box>
-        </geometry>
-        <surface>
-          <friction>
-            <ode>
-              <mu>1</mu>
-              <mu2>1</mu2>
-              <fdir1>0 0 0</fdir1>
-              <slip1>0</slip1>
-              <slip2>0</slip2>
-            </ode>
-            <torsional>
-              <coefficient>1</coefficient>
-              <patch_radius>0</patch_radius>
-              <surface_radius>0</surface_radius>
-              <use_patch_radius>1</use_patch_radius>
-              <ode>
-                <slip>0</slip>
-              </ode>
-            </torsional>
-          </friction>
-          <bounce>
-            <restitution_coefficient>0</restitution_coefficient>
-            <threshold>1e+06</threshold>
-          </bounce>
-          <contact>
-            <collide_without_contact>0</collide_without_contact>
-            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
-            <collide_bitmask>1</collide_bitmask>
-            <ode>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-              <max_vel>0.01</max_vel>
-              <min_depth>0</min_depth>
-            </ode>
-            <bullet>
-              <split_impulse>1</split_impulse>
-              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
-              <soft_cfm>0</soft_cfm>
-              <soft_erp>0.2</soft_erp>
-              <kp>1e+13</kp>
-              <kd>1</kd>
-            </bullet>
-          </contact>
-        </surface>
-      </collision>
     </link>
+
     <link name='FB_l'>
       <pose>0.259142 0.290001 -0.08779 1.5708 -0.01158 -1e-06</pose>
       <inertial>
@@ -1885,12 +1577,6 @@
 
     <provideFeedback>true</provideFeedback>
     <disableFixedJointLumping>true</disableFixedJointLumping>
-    <sensor name="ft_sensor_flwheel" type="force_torque">
-      <force_torque>
-        <frame>FW_l</frame>
-        <measure_direction>FW_l_to_FB_l</measure_direction>
-      </force_torque>
-    </sensor>
     </joint>
 
     <joint name='FB_FW_r' type='revolute'>
@@ -1927,12 +1613,6 @@
 
     <provideFeedback>true</provideFeedback>
     <disableFixedJointLumping>true</disableFixedJointLumping>
-    <sensor name="ft_sensor_frwheel" type="force_torque">
-      <force_torque>
-        <frame>FW_r</frame>
-        <measure_direction>FW_r_to_FB_r</measure_direction>
-      </force_torque>
-    </sensor>
     </joint>
 
 
@@ -2101,13 +1781,6 @@
 
     <provideFeedback>true</provideFeedback>
     <disableFixedJointLumping>true</disableFixedJointLumping>
-    <sensor name="ft_sensor_mlwheel" type="force_torque">
-      <force_torque>
-        <frame>MW_l</frame>
-        <measure_direction>MW_l_to_FB_l</measure_direction>
-      </force_torque>
-    </sensor>
-
     </joint>
 
 
@@ -2146,12 +1819,6 @@
 
       <provideFeedback>true</provideFeedback>
       <disableFixedJointLumping>true</disableFixedJointLumping>
-      <sensor name="ft_sensor_mrwheel" type="force_torque">
-        <force_torque>
-          <frame>MW_r</frame>
-          <measure_direction>MW_r_to_FB_r</measure_direction>
-        </force_torque>
-      </sensor>
       </joint>
 
 
@@ -2194,12 +1861,6 @@
 
       <provideFeedback>true</provideFeedback>
       <disableFixedJointLumping>true</disableFixedJointLumping>
-      <sensor name="ft_sensor_rlwheel" type="force_torque">
-        <force_torque>
-          <frame>RW_l</frame>
-          <measure_direction>RW_l_to_RB_l</measure_direction>
-        </force_torque>
-      </sensor>
       </joint>
 
     <joint name='RB_RW_r' type='revolute'>
@@ -2236,12 +1897,6 @@
 
       <provideFeedback>true</provideFeedback>
       <disableFixedJointLumping>true</disableFixedJointLumping>
-      <sensor name="ft_sensor_rrwheel" type="force_torque">
-        <force_torque>
-          <frame>RW_l</frame>
-          <measure_direction>RW_l_to_RB_l</measure_direction>
-        </force_torque>
-      </sensor>
       </joint>
 
     <joint name='RCL_RB_l' type='revolute'>
@@ -2308,12 +1963,12 @@
         </ode>
       </physics>
     </joint>
-<!-- ...........................SENSOR PLUGINS........................-->
 
 
-<!--......................MULTI- DIFF DRIVE (HECTOR)..........................................-->
 
-<!--no gazebo nametag for SDF-->
+
+<!--.......... MULTI-DIFF DRIVE .................-->
+
 
   <plugin name="diffdrive_plugin_multiwheel" filename="libdiffdrive_plugin_multi_wheel.so">
     <updateRate>50</updateRate>
@@ -2340,8 +1995,7 @@
   </plugin>
 
 
-<!--............................IMU PLUGIN..................................-->
-
+<!--............... IMU PLUGIN ..................-->
 
   <plugin name="imu_plugin" filename="libhector_gazebo_ros_imu.so">
       <updateRate>50.0</updateRate>
@@ -2367,149 +2021,13 @@
       <frameId>CH</frameId>
   </plugin>
 
+<!--........ ROS CONTROLLER LINKING URDF ...........-->
 
-<!--............MEASURING FORCE/TORQUE ON ALL SIX WHEELS.....................-->
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>/lsd</robotNamespace>
+    </plugin>
 
-
-  <plugin name='ft_sensor_flwheel' filename='libgazebo_ros_ft_sensor.so'>
-    <updateRate>100</updateRate>
-    <topicName>fl_wheel_ft_sensor</topicName>
-    <jointName>FB_FW_l</jointName>
-    <visualize>0</visualize>
-    <gaussianNoise>0.0</gaussianNoise>
-    <rateOffset>0.0 0.0 0.0</rateOffset>
-    <rateDrift>0.0 0.0 0.0</rateDrift>
-    <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
-    <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
-  </plugin>
-
-
-
-  <plugin name='ft_sensor_frwheel' filename='libgazebo_ros_ft_sensor.so'>
-    <updateRate>100</updateRate>
-    <topicName>fr_wheel_ft_sensor</topicName>
-    <jointName>FB_FW_r</jointName>
-    <visualize>0</visualize>
-    <gaussianNoise>0.0</gaussianNoise>
-    <rateOffset>0.0 0.0 0.0</rateOffset>
-    <rateDrift>0.0 0.0 0.0</rateDrift>
-    <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
-    <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
-  </plugin>
-
-
-  <plugin name='ft_sensor_mlwheel' filename='libgazebo_ros_ft_sensor.so'>
-    <updateRate>100</updateRate>
-    <topicName>ml_wheel_ft_sensor</topicName>
-    <jointName>FB_MW_l</jointName>
-    <visualize>0</visualize>
-    <gaussianNoise>0.0</gaussianNoise>
-    <rateOffset>0.0 0.0 0.0</rateOffset>
-    <rateDrift>0.0 0.0 0.0</rateDrift>
-    <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
-    <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
-  </plugin>
-
-
-
-  <plugin name='ft_sensor_mrwheel' filename='libgazebo_ros_ft_sensor.so'>
-    <updateRate>100</updateRate>
-    <topicName>mr_wheel_ft_sensor</topicName>
-    <jointName>FB_MW_r</jointName>
-    <visualize>0</visualize>
-    <gaussianNoise>0.0</gaussianNoise>
-    <rateOffset>0.0 0.0 0.0</rateOffset>
-    <rateDrift>0.0 0.0 0.0</rateDrift>
-    <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
-    <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
-  </plugin>
-
-
-  <plugin name='ft_sensor_rlwheel' filename='libgazebo_ros_ft_sensor.so'>
-    <updateRate>100</updateRate>
-    <topicName>rl_wheel_ft_sensor</topicName>
-    <jointName>RB_RW_l</jointName>
-    <visualize>0</visualize>
-    <gaussianNoise>0.0</gaussianNoise>
-    <rateOffset>0.0 0.0 0.0</rateOffset>
-    <rateDrift>0.0 0.0 0.0</rateDrift>
-    <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
-    <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
-  </plugin>
-
-
-  <plugin name='ft_sensor_rrwheel' filename='libgazebo_ros_ft_sensor.so'>
-    <updateRate>100</updateRate>
-    <topicName>rr_wheel_ft_sensor</topicName>
-    <jointName>RB_RW_r</jointName>
-    <visualize>0</visualize>
-    <gaussianNoise>0.0</gaussianNoise>
-    <rateOffset>0.0 0.0 0.0</rateOffset>
-    <rateDrift>0.0 0.0 0.0</rateDrift>
-    <rateDriftFrequency>0.0 0.0 0.0</rateDriftFrequency>
-    <rateGaussianNoise>0.0 0.0 0.0</rateGaussianNoise>
-  </plugin>
-
-<!-- ......................APPLYING FORCE/TORQUE ON FOUR LINKS.........................-->
-
-
-  <plugin name="gazebo_ros_force_fl_motor" filename="libgazebo_ros_force.so">
-    <alwaysOn>true</alwaysOn>
-    <update>100</update>
-    <updateRate>100.0</updateRate>
-    <bodyName>FCL_l</bodyName>
-    <topicName>fl_motor_ft_apply</topicName>
-  </plugin>
-
-
-  <plugin name="gazebo_ros_force_fr_motor" filename="libgazebo_ros_force.so">
-    <alwaysOn>true</alwaysOn>
-    <update>100</update>
-    <updateRate>100.0</updateRate>
-    <bodyName>FCL_r</bodyName>
-    <topicName>fr_motor_ft_apply</topicName>
-  </plugin>
-
-
-  <plugin name="gazebo_ros_force_bl_motor" filename="libgazebo_ros_force.so">
-    <alwaysOn>true</alwaysOn>
-    <update>100</update>
-    <updateRate>100.0</updateRate>
-    <bodyName>RCL_l</bodyName>
-    <topicName>bl_motor_ft_apply</topicName>
-  </plugin>
-
-
-  <plugin name="gazebo_ros_force_br_motor" filename="libgazebo_ros_force.so">
-    <alwaysOn>true</alwaysOn>
-    <update>100</update>
-    <updateRate>100.0</updateRate>
-    <bodyName>RCL_r</bodyName>
-    <topicName>br_motor_ft_apply</topicName>
-  </plugin>
-
-
-<!--.............................................................................-->
-
-
-
-  <plugin name="gazebo_ros_force_CH" filename="libgazebo_ros_force.so">
-    <alwaysOn>true</alwaysOn>
-    <update>100</update>
-    <updateRate>100.0</updateRate>
-    <bodyName>CH</bodyName>
-    <topicName>ch_force</topicName>
-  </plugin>
-
-
-<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-    <robotNamespace>/lsd</robotNamespace>
-</plugin>
-
-<plugin name='r200' filename='liblsd.so'>
-    <robotNamespace>/</robotNamespace>
-</plugin>
-
+<!--................................................-->
 
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>

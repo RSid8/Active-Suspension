@@ -13,8 +13,6 @@ gym_gazebo/envs/real_env.py
 gym_gazebo/envs/real_env_ros2.py
 gym_gazebo/envs/lsd_rover/__init__.py
 gym_gazebo/envs/lsd_rover/lsd_rover_active_suspension.py
-gym_gazebo/envs/lsd_rover/lsd_rover_active_suspension_2.py
-gym_gazebo/envs/lsd_rover/lsd_rover_active_suspension_3.py
 gym_gazebo/envs/unittest/__init__.py
 gym_gazebo/envs/unittest/cube_crash.py
 gym_gazebo/envs/unittest/memorize_digits.py
