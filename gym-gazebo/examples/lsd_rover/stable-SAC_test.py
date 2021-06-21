@@ -65,13 +65,18 @@ os.makedirs(log_dir, exist_ok=True)
 env = gym.make('GazeboMarsLsdForce-Lidar-v0')
 check_env(env)
 env = Monitor(env, log_dir)
-timesteps=100000
+timesteps=30000
 
-model = SAC(MlpPolicy, env, tensorboard_log=log_dir, verbose=1)
-callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=log_dir)
-model.learn(total_timesteps=int(timesteps), callback=callback)
+model = SAC.load("tmp3/best_model.zip")
+
+obs = env.reset()
+done = False
+while not done:
+    action, _states = model.predict(obs, deterministic=True)
+    obs, reward, done, info = env.step(action)
+    if done:
+      obs = env.reset()
 
 
-plot_results([log_dir], timesteps, results_plotter.X_TIMESTEPS, "SAC ActiveSuspension")
-plt.show()
-    
+
+

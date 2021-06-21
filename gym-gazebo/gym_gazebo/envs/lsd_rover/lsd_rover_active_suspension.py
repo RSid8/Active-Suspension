@@ -96,7 +96,7 @@ class LsdEnv(gazebo_env.GazeboEnv):
 
         step = ModelState()
         self.step_height = randint(25, 32)
-        # print("\nOBSTACLE HEIGHT = %scm" % self.step_height)
+        print("\033[0;32m\nOBSTACLE HEIGHT = %scm\033[0m" % self.step_height)
 
         step.model_name = 'step1'
         step.pose.position.x = 5

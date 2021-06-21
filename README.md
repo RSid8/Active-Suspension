@@ -32,6 +32,10 @@ Codebase of the Gazebo RL Closed- Chain Active Suspension System
 
       roslaunch lsd custom_world.launch world_name:=world_name.world
 
+* To load a pretrained model:
+
+      cd Active-Suspension/gym-gazebo/examples/lsd_rover && python3 stable-SAC_test.py
+
 ## Kill Background Processes
 
 * Add the alias to your bash script and source it: (One time process)
