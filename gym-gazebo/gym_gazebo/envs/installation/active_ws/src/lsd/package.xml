@@ -14,16 +14,12 @@ for lsd robot</p>
 
 
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>pcl_conversions</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
-  <build_export_depend>pcl_conversions</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
-  <exec_depend>pcl_conversions</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
-  <exec_depend>depth_image_proc</exec_depend>
 
   <depend>gazebo_ros</depend>
   <depend>geometry_msgs</depend>
@@ -38,7 +34,6 @@ for lsd robot</p>
   <depend>joy</depend>
   <depend>effort_controllers</depend>
   <depend>geodesy</depend>
-  <depend>octomap_ros</depend>
   <depend>control_toolbox</depend>
   <depend>pluginlib</depend>
   <depend>trajectory_msgs</depend>
@@ -50,8 +45,6 @@ for lsd robot</p>
   <depend>kdl_conversions</depend>
   <depend>eigen_conversions</depend>
   <depend>tf2_sensor_msgs</depend>
-  <depend>pcl_ros</depend>
-  <depend>navigation</depend>
   <depend>sophus</depend>
 
 

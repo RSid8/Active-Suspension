@@ -6,7 +6,7 @@ pip3 install -r requirements.txt
 
 cd ../../../../../Active-Suspension/
 
-sudo pip3 install -e gym-gazebo/
+pip3 install -e gym-gazebo/
 
 cd gym-gazebo/gym_gazebo/envs/installation
 
