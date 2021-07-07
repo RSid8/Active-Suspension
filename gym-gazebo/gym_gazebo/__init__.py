@@ -162,6 +162,6 @@ register(
 )
 #lsd
 register(
-    id='GazeboMarsLsdForce-Lidar-v0',
+    id='GazeboMarsLsd-v0',
     entry_point='gym_gazebo.envs.lsd_rover:LsdEnv',
 )

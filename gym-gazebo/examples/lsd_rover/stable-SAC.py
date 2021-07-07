@@ -62,7 +62,7 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
 
 log_dir = "tmp3/"
 os.makedirs(log_dir, exist_ok=True)
-env = gym.make('GazeboMarsLsdForce-Lidar-v0')
+env = gym.make('GazeboMarsLsd-v0')
 check_env(env)
 env = Monitor(env, log_dir)
 timesteps=100000
